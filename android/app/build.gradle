@@ -1,0 +1,88 @@
+apply plugin: 'com.android.application'
+
+def projectRootDir = rootProject.projectDir.parentFile
+def goldenPublicAssetsDir = new File(projectRootDir, "recovery/good-apk-public")
+def androidPublicAssetsDir = new File(projectDir, "src/main/assets/public")
+
+tasks.register("restoreGoodApkAssets") {
+    group = "bone recovery"
+    description = "Restore the known-good web assets extracted from the last working APK before Android builds."
+    inputs.dir(goldenPublicAssetsDir)
+    outputs.dir(androidPublicAssetsDir)
+    doLast {
+        if (!goldenPublicAssetsDir.exists()) {
+            throw new GradleException("Missing known-good APK assets: " + goldenPublicAssetsDir)
+        }
+        def recommendationsDir = new File(goldenPublicAssetsDir, "recommendations")
+        if (!recommendationsDir.exists()) {
+            throw new GradleException("Known-good APK assets are incomplete: missing recommendations directory")
+        }
+        def recommendationCount = fileTree(recommendationsDir).matching { include "**/*" }.files.findAll { it.isFile() }.size()
+        if (recommendationCount < 1500) {
+            throw new GradleException("Known-good APK assets look incomplete. Expected at least 1500 recommendation files, got " + recommendationCount)
+        }
+        delete androidPublicAssetsDir
+        copy {
+            from goldenPublicAssetsDir
+            into androidPublicAssetsDir
+        }
+        logger.lifecycle("Bone: restored known-good APK assets before build. recommendationFiles=" + recommendationCount)
+    }
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn("restoreGoodApkAssets")
+}
+
+android {
+    namespace = "com.bone.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.bone.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

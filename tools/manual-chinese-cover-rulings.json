@@ -1,0 +1,30 @@
+[
+  {
+    "sourceIndex": 67,
+    "coverFile": "0067_到尽_Swing.jpg",
+    "action": "correct_identity",
+    "artist": "Swing乐队",
+    "albumTitle": "Swing到尽",
+    "note": "用户人工确认；旧名称“到尽《Swing》”不使用。"
+  },
+  {
+    "sourceIndex": 246,
+    "coverFile": "0246_舌头乐队_舌头.jpg",
+    "action": "exclude",
+    "note": "用户确认：不存在“舌头乐队《舌头》”这张专辑。"
+  },
+  {
+    "sourceIndex": 313,
+    "coverFile": "0313_透明杂志_透明杂志专辑.jpg",
+    "action": "correct_identity",
+    "artist": "透明杂志",
+    "albumTitle": "透明杂志 FOREVER",
+    "note": "用户人工确认；旧名称“透明杂志《透明杂志》”不使用。"
+  },
+  {
+    "sourceIndex": 331,
+    "coverFile": "0331_面孔乐队_你快乐所以我快乐.jpg",
+    "action": "exclude",
+    "note": "用户确认：不存在“面孔乐队《你快乐所以我快乐》”这张专辑。"
+  }
+]
