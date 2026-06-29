@@ -48,8 +48,9 @@ public class NativeHttpPlugin extends Plugin {
                 connection.setReadTimeout(timeoutMs);
                 connection.setRequestProperty("Accept", "application/json,text/xml,application/xml,text/plain,*/*");
                 connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome Mobile Safari/537.36 Bone/1.0");
-                if (apiKey != null && !apiKey.trim().isEmpty()) {
-                    connection.setRequestProperty("Authorization", "Bearer " + apiKey.trim());
+                String safeApiKey = normalizeBearerToken(apiKey);
+                if (safeApiKey != null && !safeApiKey.isEmpty()) {
+                    connection.setRequestProperty("Authorization", "Bearer " + safeApiKey);
                 }
 
                 int status = connection.getResponseCode();
@@ -97,12 +98,12 @@ public class NativeHttpPlugin extends Plugin {
                 connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setInstanceFollowRedirects(true);
-                connection.setConnectTimeout(Math.min(timeoutMs, 120000));
-                connection.setReadTimeout(timeoutMs);
+                connection.setConnectTimeout(timeoutMs <= 0 ? 15000 : Math.min(timeoutMs, 120000));
+                connection.setReadTimeout(Math.max(timeoutMs, 0));
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json,text/plain,*/*");
-                connection.setRequestProperty("Authorization", "Bearer " + apiKey.trim());
+                connection.setRequestProperty("Authorization", "Bearer " + normalizeBearerToken(apiKey));
                 connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome Mobile Safari/537.36 Bone/1.0");
 
                 try (OutputStream output = connection.getOutputStream()) {
@@ -190,12 +191,12 @@ public class NativeHttpPlugin extends Plugin {
                 connection = (HttpURLConnection) requestUrl.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setInstanceFollowRedirects(true);
-                connection.setConnectTimeout(Math.min(timeoutMs, 120000));
-                connection.setReadTimeout(timeoutMs);
+                connection.setConnectTimeout(timeoutMs <= 0 ? 15000 : Math.min(timeoutMs, 120000));
+                connection.setReadTimeout(Math.max(timeoutMs, 0));
                 connection.setDoOutput(true);
                 connection.setUseCaches(false);
                 connection.setFixedLengthStreamingMode(multipartBody.length);
-                connection.setRequestProperty("Authorization", "Bearer " + apiKey.trim());
+                connection.setRequestProperty("Authorization", "Bearer " + normalizeBearerToken(apiKey));
                 connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
                 connection.setRequestProperty("Content-Length", String.valueOf(multipartBody.length));
                 connection.setRequestProperty("Accept", "application/json,text/plain,*/*");
@@ -243,6 +244,18 @@ public class NativeHttpPlugin extends Plugin {
             }
             return output.toString(StandardCharsets.UTF_8.name());
         }
+    }
+
+    private String normalizeBearerToken(String apiKey) {
+        if (apiKey == null) return "";
+        String token = apiKey.trim();
+        if ((token.startsWith("\"") && token.endsWith("\"")) || (token.startsWith("'") && token.endsWith("'"))) {
+            token = token.substring(1, token.length() - 1).trim();
+        }
+        if (token.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            token = token.substring(7).trim();
+        }
+        return token;
     }
 
     private String extractTranscriptionText(String body) {

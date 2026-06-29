@@ -34,6 +34,11 @@ vite-dev.log
 vite-dev.err.log
 *.tmp
 *.bak
+.tmp_*/
+.tmp_*
+backups/
+*.stable
+tools/probe-phone-*.mjs
 
 # Environment / secrets
 .env

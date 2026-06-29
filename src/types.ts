@@ -13,10 +13,11 @@ export type ApiCapability = 'speechToText' | 'albumIntro';
 export type ApiInterfaceType =
   | 'openai-chat'
   | 'openai-audio'
+  | 'ark-bot-chat'
   | 'ark-bot'
   | 'custom-http';
 
-export type SpeechProvider = 'siliconflow' | 'doubao' | 'zhipu';
+export type SpeechProvider = 'siliconflow' | 'doubao' | 'zhipu' | 'volcengine';
 
 export type ApiConfig = {
   enabled: boolean;

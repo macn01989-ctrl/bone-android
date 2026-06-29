@@ -218,6 +218,10 @@ button {
   will-change: transform;
 }
 
+.app-cold-start .inner-block {
+  transition: none;
+}
+
 .inner-block.active {
   transition: none;
   box-shadow:
@@ -4969,4 +4973,28 @@ button {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Keep recommendation cover faces in their original position; only detail faces get the 12px frame. */
+.recommend-front {
+  box-sizing: border-box;
+  padding-top: 0 !important;
+}
+
+.recommend-back {
+  box-sizing: border-box;
+  gap: 10px !important;
+  padding-top: 70px !important;
+}
+
+.recommend-album-detail,
+.recommend-episodes-section-front,
+.recommend-platforms-section {
+  box-sizing: border-box !important;
+  width: calc(100% - 24px) !important;
+  height: calc(100% - 24px) !important;
+  max-height: calc(100% - 24px) !important;
+  margin: 12px !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
 }

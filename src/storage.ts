@@ -4,8 +4,10 @@ import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, Po
 const SETTINGS_KEY = 'bone.settings.v1';
 const NOTES_KEY = 'bone.notes.v1';
 const DEFAULT_API_BASE_URL = 'https://api.siliconflow.cn/v1';
+const DEFAULT_ALBUM_INTRO_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions';
 const DEFAULT_ASR_MODEL = 'FunAudioLLM/SenseVoiceSmall';
 const DEFAULT_POLISH_MODEL = 'deepseek-ai/DeepSeek-V4-Pro';
+const DEFAULT_ALBUM_INTRO_MODEL = 'bot-20250612194641-hvrdt';
 const DISABLED_TEXT_MODELS = ['Qwen/Qwen3.6-35B-A3B', 'moonshotai/Kimi-K2.6'];
 
 const apiDefaults: Record<ApiCapability, ApiConfig> = {
@@ -21,18 +23,19 @@ const apiDefaults: Record<ApiCapability, ApiConfig> = {
   },
   albumIntro: {
     enabled: false,
-    interfaceType: 'openai-chat',
-    baseUrl: DEFAULT_API_BASE_URL,
+    interfaceType: 'ark-bot-chat',
+    baseUrl: DEFAULT_ALBUM_INTRO_BASE_URL,
     apiKey: '',
-    model: DEFAULT_POLISH_MODEL,
-    timeoutMs: 120000,
+    model: DEFAULT_ALBUM_INTRO_MODEL,
+    timeoutMs: 60000,
+    provider: 'volcengine',
   },
 };
 
 export const defaultSettings: AppSettings = {
   api: apiDefaults,
   polishModel: DEFAULT_POLISH_MODEL,
-  albumIntroModel: DEFAULT_POLISH_MODEL,
+  albumIntroModel: DEFAULT_ALBUM_INTRO_MODEL,
   podcastPlatform: 'xiaoyuzhou',
   musicPlatform: 'netease',
   diaryPrivacyEnabled: true,
@@ -146,6 +149,12 @@ function normalizeSettings(raw: string | null): AppSettings {
 
   try {
     const parsed = JSON.parse(raw) as Partial<AppSettings>;
+    const parsedAlbumIntroModel =
+      typeof parsed.api?.albumIntro?.model === 'string' && parsed.api.albumIntro.model.trim().startsWith('bot-')
+        ? parsed.api.albumIntro.model.trim()
+        : typeof parsed.albumIntroModel === 'string' && parsed.albumIntroModel.trim().startsWith('bot-')
+          ? parsed.albumIntroModel.trim()
+          : DEFAULT_ALBUM_INTRO_MODEL;
 
     // Migrate legacy zhipu ASR settings to unified siliconflow ASR settings.
     const legacySpeech = parsed.api?.speechToText;
@@ -173,9 +182,7 @@ function normalizeSettings(raw: string | null): AppSettings {
           ? parsed.polishModel.trim()
           : defaultSettings.polishModel,
       albumIntroModel:
-        typeof parsed.albumIntroModel === 'string' && parsed.albumIntroModel.trim() && !DISABLED_TEXT_MODELS.includes(parsed.albumIntroModel.trim())
-          ? parsed.albumIntroModel.trim()
-          : defaultSettings.albumIntroModel,
+        parsedAlbumIntroModel,
       podcastPlatform: podcastPlatforms.includes(parsed.podcastPlatform as PodcastPlatform)
         ? (parsed.podcastPlatform as PodcastPlatform)
         : defaultSettings.podcastPlatform,
@@ -196,6 +203,11 @@ function normalizeSettings(raw: string | null): AppSettings {
         albumIntro: {
           ...defaultSettings.api.albumIntro,
           ...parsed.api?.albumIntro,
+          interfaceType: 'ark-bot-chat',
+          baseUrl: DEFAULT_ALBUM_INTRO_BASE_URL,
+          model: parsedAlbumIntroModel,
+          timeoutMs: parsed.api?.albumIntro?.timeoutMs || defaultSettings.api.albumIntro.timeoutMs,
+          provider: 'volcengine',
           enabled: Boolean(parsed.api?.albumIntro?.apiKey?.trim()) || Boolean(parsed.api?.albumIntro?.enabled),
         },
       },

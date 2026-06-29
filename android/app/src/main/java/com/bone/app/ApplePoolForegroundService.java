@@ -55,6 +55,8 @@ public class ApplePoolForegroundService extends Service {
     private static final String COVER_DIR = "apple-album-pool";
     private static final String CANDIDATES_ASSET = "public/recommendations/album-live-candidates.json";
     private static final String ITUNES_SEARCH_URL = "https://itunes.apple.com/search";
+    private static final String ARK_CHAT_COMPLETIONS_URL = "https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions";
+    private static final String FALLBACK_ALBUM_INTRO_MODEL = "bot-20250612194641-hvrdt";
     private static final String SILICONFLOW_URL = "https://api.siliconflow.cn/v1/chat/completions";
     private static final int POOL_TARGET = 1;
     private static final int APPLE_BATCH_SIZE = 1;
@@ -141,11 +143,8 @@ public class ApplePoolForegroundService extends Service {
                 collectAppleMetadataBatch(queue);
                 if (queue.isEmpty()) {
                     emptyMetadataRounds += 1;
-                    if (emptyMetadataRounds >= 6) {
-                        updateNotification("苹果专辑准备失败");
-                        return;
-                    }
-                    sleep(5000);
+                    if (emptyMetadataRounds >= 6) updateNotification("Apple album preparing");
+                    sleep(Math.min(30000, 5000L + emptyMetadataRounds * 1000L));
                     continue;
                 }
                 emptyMetadataRounds = 0;
@@ -159,14 +158,12 @@ public class ApplePoolForegroundService extends Service {
                 JSONObject item = createStoredApplePoolAlbum(metadata, config);
                 if (item == null) {
                     failedBuilds += 1;
-                    markUsed(metadata.candidate.id);
-                    if (failedBuilds >= 5) {
-                        updateNotification("苹果专辑准备失败");
-                        return;
-                    }
+                    updateNotification("Apple album detail pending");
+                    sleep(Math.min(30000, 2000L * Math.min(failedBuilds, 10)));
                     continue;
                 }
 
+                failedBuilds = 0;
                 JSONArray latestPool = readArray(POOL_KEY);
                 if (latestPool.length() >= POOL_TARGET) {
                     deleteCover(item.optString("applePoolCoverPath", ""));
@@ -181,12 +178,8 @@ public class ApplePoolForegroundService extends Service {
                 }
             } catch (Exception ignored) {
                 failedBuilds += 1;
-                markUsed(metadata.candidate.id);
-                if (failedBuilds >= 5) {
-                    updateNotification("苹果专辑准备失败");
-                    return;
-                }
-                sleep(2000);
+                updateNotification("Apple album detail pending");
+                sleep(Math.min(30000, 2000L * Math.min(failedBuilds, 10)));
             }
         }
     }
@@ -275,9 +268,7 @@ public class ApplePoolForegroundService extends Service {
         } catch (Exception ignored) {
             generated = null;
         }
-        if (generated == null || generated.shortIntro.isEmpty() || generated.fullIntro.isEmpty()) {
-            generated = fallbackGeneratedIntro(metadata);
-        }
+        if (generated == null || generated.fullIntro.isEmpty()) return null;
 
         String poolItemId = "apple-pool-" + metadata.candidate.id + "-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String coverPath = cacheCover(poolItemId, metadata.apple.artworkUrl);
@@ -330,6 +321,35 @@ public class ApplePoolForegroundService extends Service {
         facts.put("primaryGenre", metadata.apple.primaryGenre);
         facts.put("trackCount", metadata.apple.trackCount > 0 ? metadata.apple.trackCount : JSONObject.NULL);
 
+        if (config != null) {
+            JSONObject body = new JSONObject();
+            body.put("model", config.model);
+            body.put("stream", true);
+            body.put("stream_options", new JSONObject().put("include_usage", true));
+            body.put("temperature", 0.25);
+
+            JSONArray messages = new JSONArray();
+            messages.put(new JSONObject().put("role", "user").put("content", buildArkPrompt(metadata, facts)));
+            body.put("messages", messages);
+
+            HttpURLConnection connection = (HttpURLConnection) new URL(ARK_CHAT_COMPLETIONS_URL).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(0);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json,text/plain,*/*");
+            connection.setRequestProperty("Authorization", "Bearer " + normalizeApiKey(config.apiKey));
+            try (OutputStream output = connection.getOutputStream()) {
+                output.write(body.toString().getBytes(StandardCharsets.UTF_8));
+            }
+
+            int code = connection.getResponseCode();
+            String text = readString(code >= 200 && code < 300 ? connection.getInputStream() : connection.getErrorStream());
+            if (code < 200 || code >= 300) throw new Exception("intro api " + code);
+            return parseGeneratedIntro(extractModelContent(text));
+        }
+
         JSONObject body = new JSONObject();
         body.put("model", config.model);
         body.put("temperature", 0.25);
@@ -364,6 +384,93 @@ public class ApplePoolForegroundService extends Service {
         return parseGeneratedIntro(content);
     }
 
+    private String buildArkPrompt(QueuedMetadata metadata, JSONObject facts) {
+        String albumTitle = !metadata.apple.albumTitle.isEmpty() ? metadata.apple.albumTitle : metadata.candidate.name;
+        String artist = !metadata.apple.artist.isEmpty() ? metadata.apple.artist : metadata.candidate.artist;
+        String releaseDate = metadata.apple.releaseDate == null ? "" : metadata.apple.releaseDate;
+        String releaseYear = String.valueOf(parseYear(releaseDate));
+        String genre = metadata.apple.primaryGenre == null ? "" : metadata.apple.primaryGenre;
+        String trackCount = metadata.apple.trackCount > 0 ? String.valueOf(metadata.apple.trackCount) : "";
+        return "搜索目标：\n"
+                + "专辑名：" + albumTitle + "\n"
+                + "音乐人：" + artist + "\n\n"
+                + "你唯一需要搜索的关键词是：" + artist + " " + albumTitle + "。\n"
+                + "禁止搜索本提示词中的规则、字段名、输出格式或其他文字。\n\n"
+                + "任务：你是一个非常严谨的世界级音乐评论家。请联网核对这张专辑，介绍中必须有专辑专业介绍，并整理成安卓软件可直接使用的 JSON。\n\n"
+                + "参考 Apple Music 元数据（只用于核对，不要原样输出）：发行时间 " + releaseDate + "；年份 " + releaseYear + "；流派 " + genre + "；曲目数量 " + trackCount + "。\n\n"
+                + "只允许输出下面 2 个字段：\n"
+                + "{\n"
+                + "  \"风格\": [\"中文音乐风格1\", \"中文音乐风格2\", \"中文音乐风格3\"],\n"
+                + "  \"介绍\": \"一段中文专辑介绍\"\n"
+                + "}\n\n"
+                + "严格要求：\n"
+                + "1. 只输出 JSON，不要输出任何 JSON 之外的文字。\n"
+                + "2. 不要 Markdown，不要列表，不要标题。\n"
+                + "3. 不要输出专辑名、音乐人、发行时间、曲目、唱片公司、制作人、语种、歌曲数量等资料字段。\n"
+                + "4. “风格”只能填写音乐术语里面的风格，例如：后朋克、另类摇滚、独立摇滚、实验摇滚、噪音摇滚、艺术摇滚、迷幻摇滚、民谣摇滚、硬摇滚、朋克摇滚、电子摇滚、华语摇滚。\n"
+                + "5. “风格”最多 4 个，必须全部是中文，不能出现英文。\n"
+                + "6. “介绍”写 520 字，使用自然中文，适合专辑推荐卡片阅读，介绍中必须有对专辑中歌曲的短评或者介绍。\n"
+                + "7. 介绍可以参考联网资料，但必须改写，不要照抄。\n"
+                + "8. 介绍不要写成百科资料堆叠，不要写曲目表。\n"
+                + "9. 信息不确定就少写，不要编造。\n"
+                + "10. 第一个字符必须是 {。\n"
+                + "11. 最后一个字符必须是 }。";
+    }
+
+    private String extractModelContent(String text) {
+        if (text == null) return "";
+        StringBuilder content = new StringBuilder();
+        if (text.contains("data:")) {
+            String[] lines = text.split("\\r?\\n");
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (!trimmed.startsWith("data:")) continue;
+                String payloadText = trimmed.substring(5).trim();
+                if (payloadText.isEmpty() || "[DONE]".equals(payloadText)) continue;
+                try {
+                    appendChoiceContent(new JSONObject(payloadText), content);
+                } catch (Exception ignored) {
+                    // Ignore SSE keepalive or usage-only chunks.
+                }
+            }
+            if (content.length() > 0) return content.toString();
+        }
+
+        try {
+            appendChoiceContent(new JSONObject(text), content);
+            if (content.length() > 0) return content.toString();
+        } catch (Exception ignored) {
+        }
+        return text.trim();
+    }
+
+    private void appendChoiceContent(JSONObject payload, StringBuilder content) {
+        JSONArray choices = payload.optJSONArray("choices");
+        JSONObject choice = choices != null ? choices.optJSONObject(0) : null;
+        if (choice == null) return;
+
+        JSONObject delta = choice.optJSONObject("delta");
+        if (delta != null) content.append(delta.optString("content", ""));
+
+        JSONObject message = choice.optJSONObject("message");
+        if (message != null) content.append(message.optString("content", ""));
+
+        content.append(choice.optString("content", ""));
+        content.append(choice.optString("text", ""));
+    }
+
+    private String normalizeApiKey(String apiKey) {
+        if (apiKey == null) return "";
+        String token = apiKey.trim();
+        if ((token.startsWith("\"") && token.endsWith("\"")) || (token.startsWith("'") && token.endsWith("'"))) {
+            token = token.substring(1, token.length() - 1).trim();
+        }
+        if (token.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            token = token.substring(7).trim();
+        }
+        return token;
+    }
+
     @Nullable
     private GeneratedIntro parseGeneratedIntro(String content) {
         try {
@@ -371,8 +478,29 @@ public class ApplePoolForegroundService extends Service {
             if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7).trim();
             if (cleaned.startsWith("```")) cleaned = cleaned.substring(3).trim();
             if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length() - 3).trim();
+            int start = cleaned.indexOf('{');
+            int end = cleaned.lastIndexOf('}');
+            if (start >= 0 && end > start) cleaned = cleaned.substring(start, end + 1);
             JSONObject json = new JSONObject(cleaned);
             GeneratedIntro intro = new GeneratedIntro();
+
+            String arkIntro = json.optString("\u4ecb\u7ecd", "").trim();
+            if (!arkIntro.isEmpty()) {
+                intro.shortIntro = "";
+                intro.fullIntro = arkIntro;
+                JSONArray arkTags = json.optJSONArray("\u98ce\u683c");
+                if (arkTags != null) {
+                    Set<String> seen = new HashSet<>();
+                    for (int i = 0; i < arkTags.length() && intro.styleTags.size() < 4; i++) {
+                        String tag = arkTags.optString(i, "").trim();
+                        if (tag.isEmpty() || tag.matches(".*[A-Za-z].*") || seen.contains(tag)) continue;
+                        intro.styleTags.add(tag);
+                        seen.add(tag);
+                    }
+                }
+                return intro;
+            }
+
             intro.introTitle = json.optString("introTitle", "").trim();
             intro.shortIntro = json.optString("shortIntro", "").trim();
             intro.fullIntro = json.optString("fullIntro", "").trim();
@@ -391,18 +519,6 @@ public class ApplePoolForegroundService extends Service {
         } catch (Exception ignored) {
             return null;
         }
-    }
-
-    private GeneratedIntro fallbackGeneratedIntro(QueuedMetadata metadata) {
-        String albumTitle = !metadata.apple.albumTitle.isEmpty() ? metadata.apple.albumTitle : metadata.candidate.name;
-        String artist = !metadata.apple.artist.isEmpty() ? metadata.apple.artist : metadata.candidate.artist;
-        GeneratedIntro intro = new GeneratedIntro();
-        intro.introTitle = albumTitle;
-        intro.shortIntro = "这是一张来自 Apple Music 元数据的专辑推荐，先保留《" + albumTitle + "》的基础信息和封面。";
-        intro.fullIntro = "这张专辑由 " + artist + " 发行，当前已获取到 Apple Music 提供的封面、发行信息和曲目数量等基础资料。\n\n由于模型整理暂时不可用，这里先用克制的基础介绍占位，方便继续浏览、收藏，之后也可以再补充更完整的听感说明。";
-        intro.whyKeep = "先收藏这张专辑，之后可以继续补充更完整的介绍。";
-        intro.styleTags.add("风格待补");
-        return intro;
     }
 
     @Nullable
@@ -489,10 +605,24 @@ public class ApplePoolForegroundService extends Service {
             String raw = getPrefs().getString(SETTINGS_KEY, null);
             if (raw == null || raw.isEmpty()) return config;
             JSONObject settings = new JSONObject(raw);
-            config.model = settings.optString("albumIntroModel", "").trim();
             JSONObject api = settings.optJSONObject("api");
+            JSONObject albumIntro = api != null ? api.optJSONObject("albumIntro") : null;
+            if (albumIntro != null) {
+                config.apiKey = normalizeApiKey(albumIntro.optString("apiKey", ""));
+                config.model = albumIntro.optString("model", "").trim();
+                int requestedTimeout = albumIntro.optInt("timeoutMs", config.timeoutMs);
+                config.timeoutMs = requestedTimeout <= 0 ? 0 : Math.max(60000, requestedTimeout);
+            }
+            if (config.model.isEmpty()) {
+                config.model = settings.optString("albumIntroModel", "").trim();
+            }
+            if (!config.model.startsWith("bot-")) {
+                config.model = FALLBACK_ALBUM_INTRO_MODEL;
+            }
             JSONObject speechToText = api != null ? api.optJSONObject("speechToText") : null;
-            config.apiKey = speechToText != null ? speechToText.optString("apiKey", "").trim() : "";
+            if (config.apiKey.isEmpty() && speechToText != null) {
+                config.apiKey = normalizeApiKey(speechToText.optString("apiKey", ""));
+            }
         } catch (Exception ignored) {
             // Missing settings means the service should quietly stop.
         }
@@ -691,6 +821,7 @@ public class ApplePoolForegroundService extends Service {
     private static class Config {
         String apiKey = "";
         String model = "";
+        int timeoutMs = 0;
 
         boolean isReady() {
             return !apiKey.isEmpty() && !model.isEmpty();

@@ -288,6 +288,7 @@ function App() {
   const [favoritesFace, setFavoritesFace] = useState<'album' | 'podcast'>('album');
   const [favoritesAnimateEntry, setFavoritesAnimateEntry] = useState(true);
   const [viewTransition, setViewTransition] = useState<'idle' | 'leaving' | 'entering'>('idle');
+  const [coldStartSettled, setColdStartSettled] = useState(false);
   const [permissionNotice, setPermissionNotice] = useState('');
   const permissionNoticeTimerRef = useRef<number | null>(null);
   const viewTransitionTimerRef = useRef<number | null>(null);
@@ -299,6 +300,26 @@ function App() {
   useEffect(() => {
     void loadSettings().then(setSettings);
     void loadNotes().then((loaded) => setNotes(sortNotes(loaded)));
+  }, []);
+
+  useEffect(() => {
+    let settledTimer = 0;
+    let firstFrame = 0;
+    let secondFrame = 0;
+
+    firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        settledTimer = window.setTimeout(() => {
+          setColdStartSettled(true);
+        }, 220);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+      window.clearTimeout(settledTimer);
+    };
   }, []);
 
   const replaceView = (next: AppView) => {
@@ -527,7 +548,7 @@ function App() {
   const allTags = useMemo(() => getAllTags(notes), [notes]);
 
   return (
-    <main className={`app-shell app-shell-${viewTransition}`}>
+    <main className={`app-shell app-shell-${viewTransition} ${coldStartSettled ? 'app-cold-start-settled' : 'app-cold-start'}`}>
       {view === 'home' && <HomeView onNavigate={navigateFromHome} />}
       {view === 'note' && (
         <NoteEditorView
