@@ -1,4 +1,4 @@
-# Bone Android
+<img width="2000" height="1414" alt="27" src="https://github.com/user-attachments/assets/44c8f10a-f611-406a-8675-cfce59176312" /># Bone Android
 
 Bone 是一个私人 Android 应用，用来记录声音、整理笔记、收藏专辑和播客。
 
@@ -6,13 +6,13 @@ Bone 是一个私人 Android 应用，用来记录声音、整理笔记、收藏
 
 ## 操作与功能
 
-<img width="3500" height="2475" alt="26" src="https://github.com/user-attachments/assets/4d0bb7e2-7c59-48a9-bb14-8e46e97a95ad" />
-<img width="3500" height="2475" alt="27" src="https://github.com/user-attachments/assets/9857d44c-00d4-4727-bb27-3c5c613ac1b5" />
-<img width="3500" height="2475" alt="28" src="https://github.com/user-attachments/assets/58bb069b-0b4b-4d98-bd63-a56d00328f2a" />
-<img width="3500" height="2475" alt="29" src="https://github.com/user-attachments/assets/cf43f3aa-eefa-44f7-80e0-d75861ac5514" />
-<img width="3500" height="2475" alt="30" src="https://github.com/user-attachments/assets/59b66178-a0cc-4b24-a766-c758e985b1e3" />
-<img width="3500" height="2475" alt="31" src="https://github.com/user-attachments/assets/f03f1db5-7157-466a-9cb0-be27c3b45a68" />
-<img width="3500" height="2475" alt="32" src="https://github.com/user-attachments/assets/2d5c353c-7ca2-4c05-8903-2dbe4be80658" />
+<img width="2000" height="1414" alt="26" src="https://github.com/user-attachments/assets/d045a9c5-9181-45c6-b91e-9a74d272a12e" />
+<img width="2000" height="1414" alt="27" src="https://github.com/user-attachments/assets/16f604ac-4cf4-4b34-9dc5-dc5086ca01ce" />
+<img width="2000" height="1414" alt="28" src="https://github.com/user-attachments/assets/b311e83b-3fa4-4c49-9843-833931aa725c" />
+<img width="2000" height="1414" alt="29" src="https://github.com/user-attachments/assets/5bfa0463-7c21-4230-b39f-42ddd4b3cef8" />
+<img width="2000" height="1414" alt="30" src="https://github.com/user-attachments/assets/c93420ca-9100-4d8d-b6ab-ed86b0ca37a4" />
+<img width="2000" height="1414" alt="31" src="https://github.com/user-attachments/assets/1e7f0c1c-7337-4ea5-bbff-25e11f953dc7" />
+<img width="2000" height="1414" alt="32" src="https://github.com/user-attachments/assets/9db0a39b-890e-4e12-976e-9c013f897812" />
 
 ## Features
 
