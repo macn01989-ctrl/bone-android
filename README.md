@@ -1,5 +1,3 @@
-<img width="2000" height="1414" alt="27" src="https://github.com/user-attachments/assets/44c8f10a-f611-406a-8675-cfce59176312" /># Bone Android
-
 Bone 是一个私人 Android 应用，用来记录声音、整理笔记、收藏专辑和播客。
 
 它不是一个传统的效率工具，更像一个随身的个人记忆盒：把语音变成文字，把文字整理成日记，把喜欢的唱片和节目收进自己的收藏墙，在需要一点灵感的时候翻出一张专辑或一档播客。
