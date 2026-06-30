@@ -51,6 +51,10 @@ android {
         }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix ".refactor"
+            versionNameSuffix "-refactor"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

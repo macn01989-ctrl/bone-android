@@ -1,0 +1,11 @@
+@import './foundation.css';
+@import './home.css';
+@import './settings.css';
+@import './recorder.css';
+@import './note-editor.css';
+@import './notes-legacy.css';
+@import './recommendations.css';
+@import './favorites.css';
+@import './placeholder-effects.css';
+@import './notes.css';
+@import './runtime-overrides.css';

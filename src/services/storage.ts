@@ -1,5 +1,5 @@
 import { Preferences } from '@capacitor/preferences';
-import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from './types';
+import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from '../shared/types';
 
 const SETTINGS_KEY = 'bone.settings.v1';
 const NOTES_KEY = 'bone.notes.v1';
