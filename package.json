@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "verify:runtime-guardrails": "node tools/verify-runtime-guardrails.mjs",
     "sync:android": "npm run build && npx cap sync android && npm run restore:good-apk-assets",
     "restore:good-apk-assets": "powershell -ExecutionPolicy Bypass -File tools/restore-good-apk-assets.ps1",
     "sync:android:source": "npm run build && npx cap sync android",
-    "build:android:safe": "npm run restore:good-apk-assets -- -SkipDist && cd android && gradlew.bat assembleDebug"
+    "build:android:safe": "npm run verify:runtime-guardrails && npm run restore:good-apk-assets -- -SkipDist && cd android && gradlew.bat assembleDebug"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

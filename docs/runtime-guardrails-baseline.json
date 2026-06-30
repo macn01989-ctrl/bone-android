@@ -1,0 +1,234 @@
+{
+  "createdOn": "2026-06-30",
+  "runtimeRoot": "recovery/good-apk-public",
+  "entry": {
+    "html": "index.html",
+    "js": "assets/index-1_-kxmKC.js",
+    "css": "assets/index-Dvq-jbN8.css"
+  },
+  "criticalFiles": [
+    {
+      "path": "index.html",
+      "bytes": 528,
+      "sha256": "599a0e250c12d4bc745cac41d41bc517bf1c486544f938d2ac214ab85208e1e4"
+    },
+    {
+      "path": "assets/index-1_-kxmKC.js",
+      "bytes": 421128,
+      "sha256": "8f539d31cc33bbc48e6e110f79434fcf0f5c1e4575a96e0cb277eb4b2c063995"
+    },
+    {
+      "path": "assets/index-Dvq-jbN8.css",
+      "bytes": 109224,
+      "sha256": "5dcc5aabf9661407d6c7629a6326576fe83fd7ba6187a3e9f7edfcdf8f134381"
+    },
+    {
+      "path": "assets/app-standard.png",
+      "bytes": 703409,
+      "sha256": "ea83aadb95ef08278344844362c6bf9b704c13bd31775add04e548a94b0f9fc2"
+    },
+    {
+      "path": "assets/asr-connectivity-test.wav",
+      "bytes": 198406,
+      "sha256": "d75d77a0b5ec3fae3729d068e3e295d0094c80bbeb6b81b93f0b0a726ba3f1eb"
+    },
+    {
+      "path": "assets/B.jpg",
+      "bytes": 171538,
+      "sha256": "af2cbcf18f86ca0d69c14417946777a5e098d603cc8f46176ad94fcc31af7976"
+    },
+    {
+      "path": "assets/fit.jpg",
+      "bytes": 10239,
+      "sha256": "1ae7041ec4b3e0e5347f2ef906d1a097a428eb36ef48c38fb0928526e129f263"
+    },
+    {
+      "path": "kd/fit.jpg",
+      "bytes": 10239,
+      "sha256": "1ae7041ec4b3e0e5347f2ef906d1a097a428eb36ef48c38fb0928526e129f263"
+    },
+    {
+      "path": "kd/B.jpg",
+      "bytes": 46663,
+      "sha256": "c8233ad8d5474a6de314dc1df2d28e2515d2abe0604d4c2786c21d15df6bb9c4"
+    },
+    {
+      "path": "kd/black.jpg",
+      "bytes": 12491,
+      "sha256": "492244d93760d02639c87ac489ccaf5bccd11979dfa19bd74efc0faddaeb62ce"
+    },
+    {
+      "path": "kd/white.png",
+      "bytes": 2069,
+      "sha256": "9e271873b15a2efce94aa74072ec9fcc34066391981e92292f417d48876ba14d"
+    },
+    {
+      "path": "kd/yellow.png",
+      "bytes": 2059,
+      "sha256": "1f3adbf34283c8997e3c7d629e3040429e1b2c247f4873c69e01007e0385c98b"
+    },
+    {
+      "path": "kd/blue.png",
+      "bytes": 6255,
+      "sha256": "ecc7f8d397ad2e687306ebf5e39758d25210fd79a5939346257ea1cb4745b1a7"
+    },
+    {
+      "path": "kd/red.jpg",
+      "bytes": 21738,
+      "sha256": "2e061e9533671ecdb0cf34c5144cf238896e320b6dc05eee5beb597065f56894"
+    },
+    {
+      "path": "kd/marilyn.png",
+      "bytes": 281631,
+      "sha256": "7b5f6ec7dc1de2cd8cbed33f56ed67fa6043f2b0cad8d6789158d22441fa0ba3"
+    },
+    {
+      "path": "kd/underground.png",
+      "bytes": 276574,
+      "sha256": "6b00c51f075b02690a2f1464108d1353df12e97823db05a01a2ba0668e3bcf11"
+    }
+  ],
+  "routes": [
+    "album",
+    "favorites",
+    "home",
+    "note",
+    "notes",
+    "podcast",
+    "recorder",
+    "settings"
+  ],
+  "uiFunctions": [
+    {
+      "name": "fr",
+      "marker": "app-shell"
+    },
+    {
+      "name": "pr",
+      "marker": "home-screen"
+    },
+    {
+      "name": "mr",
+      "marker": "page1-note-editor-screen"
+    },
+    {
+      "name": "hr",
+      "marker": "recorder-page"
+    },
+    {
+      "name": "gr",
+      "marker": "notes-screen page4-screen"
+    },
+    {
+      "name": "yr",
+      "marker": "settings-screen settings-screen-redesign"
+    },
+    {
+      "name": "Cr",
+      "marker": "recommend-episodes-section-front"
+    },
+    {
+      "name": "wr",
+      "marker": "recommend-album-styles"
+    },
+    {
+      "name": "Tr",
+      "marker": "recommend-album-detail"
+    },
+    {
+      "name": "Er",
+      "marker": "favorites-page"
+    },
+    {
+      "name": "Dr",
+      "marker": "placeholder-screen"
+    }
+  ],
+  "customPlugins": [
+    "ApplePool",
+    "ExternalMusic",
+    "ImageActions",
+    "NativeHttp"
+  ],
+  "standardPlugins": [
+    "App",
+    "CapacitorCookies",
+    "CapacitorHttp",
+    "Filesystem",
+    "Haptics",
+    "Preferences",
+    "Share",
+    "SystemBars"
+  ],
+  "androidPlugins": {
+    "ApplePool": "ApplePoolPlugin.java",
+    "ExternalMusic": "ExternalMusicPlugin.java",
+    "ImageActions": "ImageActionsPlugin.java",
+    "NativeHttp": "NativeHttpPlugin.java"
+  },
+  "recommendations": {
+    "totalFiles": 1802,
+    "albumCatalog": {
+      "path": "recommendations/album-catalog.json",
+      "total": 1535,
+      "collections": {
+        "rolling-stone-500": 473,
+        "chinese-rock": 268,
+        "1001-albums": 794
+      }
+    },
+    "podcasts": {
+      "path": "recommendations/podcasts.json",
+      "total": 300
+    },
+    "liveCandidates": {
+      "path": "recommendations/album-live-candidates.json",
+      "total": 6684
+    },
+    "legacyAlbums": {
+      "path": "recommendations/albums.json",
+      "total": 300
+    },
+    "chineseManualCoverMap": {
+      "path": "recommendations/chinese-manual-cover-map.json",
+      "total": 268
+    },
+    "coverFiles": {
+      "recommendations/album-covers/1001": 788,
+      "recommendations/album-covers/chinese": 268,
+      "recommendations/album-covers/rolling-stone": 473
+    }
+  },
+  "storageKeys": [
+    "bone.settings.v1",
+    "bone.notes.v1",
+    "bone.album-favorites",
+    "bone.podcast-favorites",
+    "bone.recommendation-history.${kind}",
+    "bone.apple-album-pool.v1",
+    "bone.apple-album-pool.ready.v1",
+    "bone.apple-album-pool.used.v1",
+    "bone.apple-album-pool.running.v1"
+  ],
+  "knownLegacyCssSelectors": [
+    "api-panel",
+    "api-grid",
+    "api-panel-actions",
+    "api-panel-head",
+    "settings-count-card",
+    "settings-count-grid",
+    "settings-hero-actions",
+    "settings-kicker",
+    "settings-toggle-row",
+    "settings-volcano-subcard",
+    "page1-fab-save-icon",
+    "page1-fab-save-icon-visible",
+    "page1-save-icon-disk",
+    "page4-delete-dialog",
+    "page4-delete-mark",
+    "page4-tag-filter-row",
+    "recommend-failure",
+    "recommend-retry-button",
+    "recommend-album-intro"
+  ]
+}
