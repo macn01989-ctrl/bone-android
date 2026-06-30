@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronLeft, Copy, Download, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { buildSettingsBackup, downloadBlob, readSettingsFromBackup, restoreFavoritesFromBackup } from '../../services/backup';
 import { getAppleAlbumPoolCount, getLiveAlbumReserveStatus } from '../../services/recommendations';
+import { checkSpeechConnectivity } from '../../services/speech';
 import { writeTextToClipboard } from '../../shared/clipboard';
 import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from '../../shared/types';
 import { ApiPanel } from './ApiPanel';
 
 const SILICONFLOW_CHAT_COMPLETIONS_URL = 'https://api.siliconflow.cn/v1/chat/completions';
-const SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL = 'https://api.siliconflow.cn/v1/audio/transcriptions';
 const VOLCANO_ALBUM_INTRO_URL = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions';
 const DEFAULT_ALBUM_INTRO_MODEL = 'bot-20250612194641-hvrdt';
 
@@ -71,22 +71,7 @@ async function assertOk(response: Response, label: string) {
 }
 
 async function checkSpeechModel(apiKey: string, model: string) {
-  const source = await fetch('/assets/asr-connectivity-test.wav');
-  await assertOk(source, 'test audio');
-  const blob = await source.blob();
-  const formData = new FormData();
-  formData.append('file', new File([blob], 'asr-connectivity-test.wav', { type: blob.type || 'audio/wav' }));
-  formData.append('model', model);
-
-  const response = await fetch(SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: formData,
-    signal: AbortSignal.timeout(30000),
-  });
-  await assertOk(response, 'speech api');
+  await checkSpeechConnectivity(apiKey, model);
 }
 
 async function checkChatModel(apiKey: string, model: string) {

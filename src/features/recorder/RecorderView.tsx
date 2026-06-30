@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Haptics } from '@capacitor/haptics';
 import { createNoteId } from '../../services/storage';
+import { transcribeSpeechAudio } from '../../services/speech';
 import type { AppSettings, BoneNote, NoteAudio } from '../../shared/types';
-import { DEFAULT_POLISH_MODEL, SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL } from '../../shared/apiMeta';
-import { audioExtension, blobToDataUrl, chooseAudioMimeType, extractChatText, extractTranscriptionText, formatRecorderTime } from '../../shared/media/audio';
+import { DEFAULT_POLISH_MODEL } from '../../shared/apiMeta';
+import { audioExtension, blobToDataUrl, chooseAudioMimeType, extractChatText, formatRecorderTime, normalizeAudioToWav, recommendedAsrTimeout } from '../../shared/media/audio';
 
 export function RecorderView({
   settings,
@@ -102,7 +103,7 @@ export function RecorderView({
     }
   };
 
-  const transcribeAudio = async (blob: Blob) => {
+  const transcribeAudio = async (blob: Blob, durationSeconds: number) => {
     const api = settings.api.speechToText;
     setIsTranscribing(true);
     setProcessingType('transcribe');
@@ -115,24 +116,17 @@ export function RecorderView({
     }
 
     try {
-      const formData = new FormData();
-      const fileName = audioName || `bone-recording-${Date.now()}.${audioExtension(blob.type)}`;
-      formData.append('file', new File([blob], fileName, { type: blob.type || 'audio/webm' }));
-      formData.append('model', api.model);
-      const response = await fetch(SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${api.apiKey}`,
-        },
-        body: formData,
-        signal: AbortSignal.timeout(api.timeoutMs || 30000),
+      const uploadBlob = await normalizeAudioToWav(blob);
+      const mimeType = uploadBlob.type || blob.type || 'audio/webm';
+      const fileName = `bone-recording-${Date.now()}.${audioExtension(mimeType)}`;
+      const text = await transcribeSpeechAudio({
+        apiKey: api.apiKey,
+        model: api.model,
+        blob: uploadBlob,
+        fileName,
+        mimeType,
+        timeoutMs: recommendedAsrTimeout(durationSeconds, api.timeoutMs),
       });
-
-      const responseText = await response.text();
-      if (!response.ok) throw new Error(`speech api ${response.status}: ${responseText}`);
-
-      const result = JSON.parse(responseText || '{}');
-      const text = extractTranscriptionText(result);
       if (!text.trim()) {
         setTranscriptionText('未能识别出语音内容，请说话清晰一些');
         setIsTranscribing(false);
@@ -229,6 +223,7 @@ export function RecorderView({
 
       recorder.onstop = () => {
         const stopType = stopTypeRef.current;
+        const durationSeconds = secondsRef.current;
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || mimeType || 'audio/webm' });
         stopTracks();
         mediaRecorderRef.current = null;
@@ -251,7 +246,7 @@ export function RecorderView({
         void blobToDataUrl(blob).then((dataUrl) => {
           setAudioDataUrl(dataUrl);
           setShowPopup(true);
-          void transcribeAudio(blob);
+          void transcribeAudio(blob, durationSeconds);
         });
       };
 
