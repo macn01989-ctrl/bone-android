@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { scrubApiKeys } from './storage';
-import type { AppSettings, BackupManifest, BoneNote } from './types';
+import type { AppSettings, BackupManifest, BoneNote } from '../shared/types';
 
 type FavoritesBackup = {
   albums: unknown[];

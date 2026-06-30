@@ -1,20 +1,23 @@
 import { Preferences } from '@capacitor/preferences';
-import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from './types';
+import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from '../shared/types';
+import {
+  DEFAULT_ALBUM_INTRO_MODEL,
+  DEFAULT_ASR_MODEL,
+  DEFAULT_POLISH_MODEL,
+  SILICONFLOW_API_BASE_URL,
+  VOLCANO_ALBUM_INTRO_URL,
+} from '../shared/apiConstants';
+import { musicPlatformOptions, podcastPlatformOptions } from '../shared/platformLinks';
 
 const SETTINGS_KEY = 'bone.settings.v1';
 const NOTES_KEY = 'bone.notes.v1';
-const DEFAULT_API_BASE_URL = 'https://api.siliconflow.cn/v1';
-const DEFAULT_ALBUM_INTRO_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions';
-const DEFAULT_ASR_MODEL = 'FunAudioLLM/SenseVoiceSmall';
-const DEFAULT_POLISH_MODEL = 'deepseek-ai/DeepSeek-V4-Pro';
-const DEFAULT_ALBUM_INTRO_MODEL = 'bot-20250612194641-hvrdt';
 const DISABLED_TEXT_MODELS = ['Qwen/Qwen3.6-35B-A3B', 'moonshotai/Kimi-K2.6'];
 
 const apiDefaults: Record<ApiCapability, ApiConfig> = {
   speechToText: {
     enabled: false,
     interfaceType: 'openai-audio',
-    baseUrl: DEFAULT_API_BASE_URL,
+    baseUrl: SILICONFLOW_API_BASE_URL,
     apiKey: '',
     model: DEFAULT_ASR_MODEL,
     timeoutMs: 600000,
@@ -24,7 +27,7 @@ const apiDefaults: Record<ApiCapability, ApiConfig> = {
   albumIntro: {
     enabled: false,
     interfaceType: 'ark-bot-chat',
-    baseUrl: DEFAULT_ALBUM_INTRO_BASE_URL,
+    baseUrl: VOLCANO_ALBUM_INTRO_URL,
     apiKey: '',
     model: DEFAULT_ALBUM_INTRO_MODEL,
     timeoutMs: 60000,
@@ -42,9 +45,6 @@ export const defaultSettings: AppSettings = {
   includeApiKeysInBackup: false,
   backupMode: 'merge',
 };
-
-const podcastPlatforms: PodcastPlatform[] = ['xiaoyuzhou', 'apple-podcasts'];
-const musicPlatforms: MusicPlatform[] = ['netease', 'spotify', 'apple-music', 'qq-music'];
 
 const localFallback = {
   getItem(key: string) {
@@ -163,8 +163,8 @@ function normalizeSettings(raw: string | null): AppSettings {
           ...legacySpeech,
           baseUrl:
             legacySpeech.baseUrl?.includes('open.bigmodel.cn')
-              ? DEFAULT_API_BASE_URL
-              : legacySpeech.baseUrl || DEFAULT_API_BASE_URL,
+              ? SILICONFLOW_API_BASE_URL
+              : legacySpeech.baseUrl || SILICONFLOW_API_BASE_URL,
           model:
             legacySpeech.model === 'glm-asr-2512' || !legacySpeech.model?.trim()
               ? DEFAULT_ASR_MODEL
@@ -183,10 +183,10 @@ function normalizeSettings(raw: string | null): AppSettings {
           : defaultSettings.polishModel,
       albumIntroModel:
         parsedAlbumIntroModel,
-      podcastPlatform: podcastPlatforms.includes(parsed.podcastPlatform as PodcastPlatform)
+      podcastPlatform: podcastPlatformOptions.some((option) => option.value === parsed.podcastPlatform)
         ? (parsed.podcastPlatform as PodcastPlatform)
         : defaultSettings.podcastPlatform,
-      musicPlatform: musicPlatforms.includes(parsed.musicPlatform as MusicPlatform)
+      musicPlatform: musicPlatformOptions.some((option) => option.value === parsed.musicPlatform)
         ? (parsed.musicPlatform as MusicPlatform)
         : defaultSettings.musicPlatform,
       diaryPrivacyEnabled:
@@ -204,7 +204,7 @@ function normalizeSettings(raw: string | null): AppSettings {
           ...defaultSettings.api.albumIntro,
           ...parsed.api?.albumIntro,
           interfaceType: 'ark-bot-chat',
-          baseUrl: DEFAULT_ALBUM_INTRO_BASE_URL,
+          baseUrl: VOLCANO_ALBUM_INTRO_URL,
           model: parsedAlbumIntroModel,
           timeoutMs: parsed.api?.albumIntro?.timeoutMs || defaultSettings.api.albumIntro.timeoutMs,
           provider: 'volcengine',

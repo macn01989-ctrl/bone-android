@@ -1,0 +1,550 @@
+.recorder-page {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.recorder-container {
+  display: flex;
+  width: 98%;
+  height: 97.5%;
+  align-items: center;
+  justify-content: center;
+  background: rgba(232, 232, 232, 0.7);
+  border: 3px inset rgba(255, 255, 255, 0.7);
+  border-radius: calc(var(--rpx) * 40);
+  box-shadow:
+    inset calc(var(--rpx) * 30) calc(var(--rpx) * 30) calc(var(--rpx) * 80) rgba(218, 218, 218, 0.7),
+    inset calc(var(--rpx) * -30) calc(var(--rpx) * -30) calc(var(--rpx) * 80) rgba(245, 245, 245, 0.7),
+    0 0 calc(var(--rpx) * 40) rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.recorder-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 70vw;
+  height: calc(var(--rpx) * 602);
+  align-items: center;
+  justify-content: center;
+  background: #e8e8e8;
+  border: 3px outset #ffffff;
+  border-radius: calc(var(--rpx) * 30);
+  box-shadow:
+    calc(var(--rpx) * -6) calc(var(--rpx) * -6) calc(var(--rpx) * 12) rgba(255, 255, 255, 0.8),
+    calc(var(--rpx) * 6) calc(var(--rpx) * 6) calc(var(--rpx) * 16) rgba(0, 0, 0, 0.5);
+}
+
+.recorder-card-title {
+  position: absolute;
+  top: calc(var(--rpx) * -340);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  font-family: sans-serif;
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 0;
+  transform: translateX(-50%);
+}
+
+.recorder-title-b {
+  color: #000000;
+  text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.recorder-title-dot {
+  color: #e0e0e0;
+  text-shadow:
+    1px 1px 2px rgba(255, 255, 255, 0.8),
+    -1px -1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.recorder-title-o {
+  color: rgba(255, 215, 0, 0.9);
+  text-shadow:
+    1px 1px 2px rgba(255, 255, 255, 1),
+    -1px -1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.recorder-title-n {
+  color: rgba(209, 35, 42, 0.9);
+  text-shadow:
+    1px 1px 2px rgba(255, 255, 255, 1),
+    -1px -1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.recorder-title-e {
+  color: rgba(30, 136, 229, 0.9);
+  text-shadow:
+    1px 1px 2px rgba(255, 255, 255, 1),
+    -1px -1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.recorder-timer {
+  position: absolute;
+  top: calc(var(--rpx) * 90);
+  z-index: 2;
+  color: #333333;
+  font-family: monospace;
+  font-size: calc(var(--rpx) * 64);
+  font-weight: 900;
+  transition: all 0.5s ease;
+}
+
+.recorder-timer.recording {
+  padding: calc(var(--rpx) * 20) calc(var(--rpx) * 40);
+  color: #444444;
+  background: #e8e8e8;
+  border-radius: calc(var(--rpx) * 20);
+  box-shadow:
+    inset calc(var(--rpx) * 8) calc(var(--rpx) * 8) calc(var(--rpx) * 16) #d1d1d1,
+    inset calc(var(--rpx) * -8) calc(var(--rpx) * -8) calc(var(--rpx) * 16) #ffffff;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.recorder-button {
+  position: relative;
+  top: calc(var(--rpx) * 100);
+  left: calc(var(--rpx) * 2);
+  display: block;
+  width: calc(var(--rpx) * 372);
+  height: calc(var(--rpx) * 179);
+  padding: 0 calc(var(--rpx) * 16) calc(var(--rpx) * 24);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+
+.recorder-button-top {
+  position: relative;
+  top: calc(var(--rpx) * 2);
+  z-index: 0;
+  display: flex;
+  height: calc(var(--rpx) * 141);
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--rpx) * 16) calc(var(--rpx) * 32);
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 calc(var(--rpx) * -1) rgba(0, 0, 0, 0.25);
+  transform: translateY(0);
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+.recorder-button-top::after {
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background: rgba(209, 35, 42, 1);
+  border-radius: calc(var(--rpx) * 8);
+  box-shadow:
+    inset 0 0 0 calc(var(--rpx) * 2) rgba(255, 255, 255, 0.2),
+    0 calc(var(--rpx) * 2) calc(var(--rpx) * 4) calc(var(--rpx) * 2) rgba(255, 255, 255, 0.2);
+  transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.recorder-button:active .recorder-button-top {
+  transform: translateY(calc(var(--rpx) * 12));
+}
+
+.recorder-button:active .recorder-button-top::after {
+  padding: 0 calc(var(--rpx) * 4);
+  border-radius: calc(var(--rpx) * 12);
+}
+
+.recorder-button-bottom {
+  position: absolute;
+  bottom: calc(var(--rpx) * 8);
+  left: calc(var(--rpx) * 8);
+  z-index: -1;
+  width: calc(100% - var(--rpx) * 16);
+  height: calc(100% - var(--rpx) * 20);
+  padding-top: calc(var(--rpx) * 12);
+  background: #b01e24;
+  border-radius: calc(var(--rpx) * 16) / calc(var(--rpx) * 32) calc(var(--rpx) * 32)
+    calc(var(--rpx) * 16) calc(var(--rpx) * 16);
+  box-shadow:
+    0 calc(var(--rpx) * 4) calc(var(--rpx) * 6) 0 rgba(0, 0, 0, 0.5),
+    inset 0 calc(var(--rpx) * -2) calc(var(--rpx) * 6) calc(var(--rpx) * 6) rgba(0, 0, 0, 0.4);
+  transition: background 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.recorder-button:active .recorder-button-bottom {
+  padding-top: 0;
+  border-radius: calc(var(--rpx) * 20) calc(var(--rpx) * 20) calc(var(--rpx) * 16)
+    calc(var(--rpx) * 16) / calc(var(--rpx) * 16);
+}
+
+.recorder-button-base {
+  position: absolute;
+  top: calc(var(--rpx) * 8);
+  left: 0;
+  z-index: -2;
+  width: 100%;
+  height: calc(100% - var(--rpx) * 8);
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: calc(var(--rpx) * 24);
+  box-shadow:
+    0 calc(var(--rpx) * 2) calc(var(--rpx) * 2) 0 rgba(255, 255, 255, 0.75),
+    inset 0 calc(var(--rpx) * 4) calc(var(--rpx) * 4) rgba(0, 0, 0, 0.25);
+}
+
+.recorder-button.start .recorder-button-top::after {
+  background: rgba(30, 136, 229, 0.95);
+}
+
+.recorder-button.start .recorder-button-bottom {
+  background: #1976d2;
+}
+
+.recorder-button.cancel .recorder-button-top::after {
+  background: rgba(255, 215, 0, 0.95);
+}
+
+.recorder-button.cancel .recorder-button-bottom {
+  background: #e6c200;
+}
+
+.recorder-playing-loading {
+  position: absolute;
+  top: calc(var(--rpx) * -130);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--rpx) * 30);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.recorder-spin-circle {
+  width: calc(var(--rpx) * 50);
+  height: calc(var(--rpx) * 50);
+  border-width: calc(var(--rpx) * 4);
+  border-style: solid;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: recorder-spin 1s linear infinite;
+}
+
+.recorder-mondrian-red {
+  border-right-color: #d12324;
+  border-left-color: #d12324;
+}
+
+.recorder-mondrian-yellow {
+  border-right-color: #ffd700;
+  border-left-color: #ffd700;
+}
+
+.recorder-mondrian-blue {
+  border-right-color: #1e88e5;
+  border-left-color: #1e88e5;
+}
+
+@keyframes recorder-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.recorder-recording-loading {
+  position: absolute;
+  bottom: calc(var(--rpx) * -260);
+  left: 50%;
+  display: flex;
+  height: calc(var(--rpx) * 100);
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--rpx) * 20);
+  transform: translateX(-50%);
+}
+
+.recorder-loading-bar {
+  width: calc(var(--rpx) * 12);
+  height: 100%;
+  background: #2196f3;
+  border-radius: calc(var(--rpx) * 6);
+  animation: recorder-wave 1s ease-in-out infinite;
+}
+
+.recorder-loading-bar:nth-child(1),
+.recorder-loading-bar:nth-child(5) {
+  background: #d13535;
+}
+
+.recorder-loading-bar:nth-child(2),
+.recorder-loading-bar:nth-child(4) {
+  background: #f6bb02;
+}
+
+.recorder-loading-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.recorder-loading-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.recorder-loading-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.recorder-loading-bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes recorder-wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.recorder-popup-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.recorder-popup-mask.show {
+  opacity: 1;
+}
+
+.recorder-popup-content {
+  display: flex;
+  width: 100%;
+  height: calc(var(--rpx) * 1050);
+  max-height: calc(95svh + var(--rpx) * 490);
+  flex-direction: column;
+  margin-bottom: calc(var(--rpx) * -450);
+  padding: calc(var(--rpx) * 40) calc(var(--rpx) * 40) calc(var(--rpx) * 530);
+  background: #e8e8e8;
+  border: 3px outset #d13535;
+  border-top-color: rgba(209, 53, 53, 0.95);
+  border-right-color: rgba(209, 53, 53, 0.75);
+  border-bottom-color: rgba(209, 53, 53, 0.75);
+  border-left-color: rgba(209, 53, 53, 0.95);
+  border-radius: calc(var(--rpx) * 48);
+  box-shadow:
+    calc(var(--rpx) * -6) calc(var(--rpx) * -6) calc(var(--rpx) * 12) rgba(255, 255, 255, 0.8),
+    calc(var(--rpx) * 6) calc(var(--rpx) * 6) calc(var(--rpx) * 16) rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.recorder-popup-content.show {
+  transform: translateY(calc(var(--rpx) * -450));
+}
+
+.recorder-transcription-container {
+  position: relative;
+  display: flex;
+  width: 95%;
+  height: calc(var(--rpx) * 690);
+  min-height: calc(var(--rpx) * 690);
+  max-height: calc(var(--rpx) * 690);
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: calc(var(--rpx) * 20) auto 0;
+  overflow-y: auto;
+  padding: calc(var(--rpx) * 20);
+  background: rgba(232, 232, 232, 0.93);
+  border-radius: calc(var(--rpx) * 36);
+  box-shadow:
+    inset calc(var(--rpx) * -10) calc(var(--rpx) * -10) calc(var(--rpx) * 20) rgba(255, 255, 255, 0.9),
+    inset calc(var(--rpx) * 10) calc(var(--rpx) * 10) calc(var(--rpx) * 20) rgba(0, 0, 0, 0.25);
+  transform: translateX(calc(var(--rpx) * -5));
+  -webkit-overflow-scrolling: touch;
+}
+
+.recorder-loading-text {
+  position: fixed;
+  top: calc(50% - 120px);
+  left: 50%;
+  z-index: 1002;
+  padding: calc(var(--rpx) * 10) calc(var(--rpx) * 30);
+  color: #666666;
+  background: rgba(232, 232, 232, 0.8);
+  border-radius: calc(var(--rpx) * 20);
+  font-size: calc(var(--rpx) * 28);
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.recorder-transcription-text {
+  width: 100%;
+  margin-top: calc(var(--rpx) * 20);
+  padding: calc(var(--rpx) * 20) calc(var(--rpx) * 10);
+  color: #333333;
+  font-size: calc(var(--rpx) * 28);
+  line-height: 1.6;
+  text-align: left;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.recorder-loading {
+  --speed-of-animation: 0.7s;
+  --first-color: #2196f3;
+  --second-color: #d13535;
+  --third-color: #f6bb02;
+  --fourth-color: #f6bb02;
+  --fifth-color: #2196f3;
+  position: absolute;
+  z-index: 1000;
+  display: flex;
+  width: 100px;
+  height: 100px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.recorder-loading span {
+  width: 4px;
+  height: 50px;
+  background: var(--first-color);
+  animation: recorder-scale var(--speed-of-animation) ease-in-out infinite;
+}
+
+.recorder-loading span:nth-child(2) {
+  background: var(--second-color);
+  animation-delay: -0.8s;
+}
+
+.recorder-loading span:nth-child(3) {
+  background: var(--third-color);
+  animation-delay: -0.7s;
+}
+
+.recorder-loading span:nth-child(4) {
+  background: var(--fourth-color);
+  animation-delay: -0.6s;
+}
+
+.recorder-loading span:nth-child(5) {
+  background: var(--fifth-color);
+  animation-delay: -0.5s;
+}
+
+.recorder-processing-loading {
+  position: fixed;
+  top: calc(50% - 40px);
+  left: 50%;
+  z-index: 1001;
+  width: 80px;
+  height: 80px;
+  gap: 4px;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.recorder-processing-loading span {
+  width: 3px;
+  height: 40px;
+}
+
+@keyframes recorder-scale {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.05);
+  }
+
+  20% {
+    transform: scaleY(1);
+  }
+}
+
+.recorder-preview-actions {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: calc(var(--rpx) * 90);
+  margin-top: calc(var(--rpx) * 5);
+  padding: calc(var(--rpx) * 45) 0;
+}
+
+.recorder-preview-action-item {
+  display: flex;
+  width: calc(var(--rpx) * 160);
+  height: calc(var(--rpx) * 100);
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--rpx) * 28);
+  border: 0;
+  border-radius: calc(var(--rpx) * 48);
+  font-size: calc(var(--rpx) * 34);
+  transition: all 0.3s ease;
+}
+
+.recorder-play-btn {
+  color: rgba(27, 27, 27, 0.9);
+  background-color: rgba(255, 215, 0, 0.9);
+  box-shadow:
+    calc(var(--rpx) * 16) calc(var(--rpx) * 16) calc(var(--rpx) * 40) rgba(255, 215, 0, 0.3),
+    calc(var(--rpx) * -8) calc(var(--rpx) * -8) calc(var(--rpx) * 30) rgba(255, 255, 255, 0.5),
+    inset calc(var(--rpx) * -1) calc(var(--rpx) * -1) calc(var(--rpx) * 4) rgba(255, 255, 255, 0.4),
+    inset calc(var(--rpx) * 2) calc(var(--rpx) * 2) calc(var(--rpx) * 6) rgba(0, 0, 0, 0.15);
+}
+
+.recorder-edit-btn {
+  color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(30, 136, 229, 0.9);
+  box-shadow:
+    calc(var(--rpx) * 16) calc(var(--rpx) * 16) calc(var(--rpx) * 40) rgba(30, 136, 229, 0.3),
+    calc(var(--rpx) * -8) calc(var(--rpx) * -8) calc(var(--rpx) * 30) rgba(255, 255, 255, 0.5),
+    inset calc(var(--rpx) * -1) calc(var(--rpx) * -1) calc(var(--rpx) * 4) rgba(255, 255, 255, 0.4),
+    inset calc(var(--rpx) * 2) calc(var(--rpx) * 2) calc(var(--rpx) * 6) rgba(0, 0, 0, 0.2);
+}
+
+.recorder-preview-action-item:active {
+  transform: scale(0.95);
+  box-shadow:
+    calc(var(--rpx) * 8) calc(var(--rpx) * 8) calc(var(--rpx) * 20) rgba(0, 0, 0, 0.2),
+    calc(var(--rpx) * -4) calc(var(--rpx) * -4) calc(var(--rpx) * 15) rgba(255, 255, 255, 0.7),
+    inset calc(var(--rpx) * -1) calc(var(--rpx) * -1) calc(var(--rpx) * 4) rgba(255, 255, 255, 0.3),
+    inset calc(var(--rpx) * 1) calc(var(--rpx) * 1) calc(var(--rpx) * 3) rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 520px) {
+  .recorder-card {
+    width: 72vw;
+  }
+
+  .recorder-card-title {
+    top: calc(var(--rpx) * -310);
+    font-size: 48px;
+  }
+}

@@ -1,0 +1,125 @@
+.placeholder-screen {
+  display: flex;
+  flex-direction: column;
+  padding: calc(18px + var(--safe-top)) calc(18px + var(--safe-right))
+    calc(18px + var(--safe-bottom)) calc(18px + var(--safe-left));
+}
+
+.back-chip {
+  align-self: flex-start;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 999px;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.placeholder-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.placeholder-content h1 {
+  margin: 18px 0 8px;
+  font-size: 28px;
+}
+
+.placeholder-content p {
+  margin: 0;
+  color: #555555;
+  line-height: 1.55;
+}
+
+.permission-notice {
+  position: fixed;
+  top: calc(14px + var(--safe-top));
+  left: 50%;
+  z-index: 2000;
+  max-width: min(86vw, 420px);
+  padding: 10px 14px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.26);
+  font-weight: 800;
+  transform: translateX(-50%);
+}
+
+@keyframes rotateColors {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientMove {
+  to {
+    background-position: 0 400%;
+  }
+}
+
+@keyframes gradientMoveHorizontal {
+  to {
+    background-position: 400% 0;
+  }
+}
+
+@keyframes longPressEffect {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(3825deg);
+    box-shadow:
+      1px 1px 0 var(--red),
+      -1px -1px 0 var(--blue),
+      1px -1px 0 var(--yellow),
+      -1px 1px 0 var(--black);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@media (max-width: 360px), (max-height: 650px) {
+  .settings-fab {
+    width: 48px;
+    height: 48px;
+  }
+
+  .settings-content {
+    padding: 14px;
+  }
+
+  .api-panel {
+    box-shadow: 4px 4px 0 #000000;
+  }
+}
+
+@media (min-width: 700px) {
+  .outer-diamond {
+    width: min(40vw, 252px);
+    height: min(40vw, 252px);
+  }
+
+  .inner-block {
+    width: min(18vw, 110px);
+    height: min(18vw, 110px);
+  }
+}
