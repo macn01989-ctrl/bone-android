@@ -1,4 +1,5 @@
 import { page1Assets } from '../shared/assets';
+import type { RecommendationAlbum, RecommendationPodcast } from '../services/recommendations';
 
 export type PodcastEpisode = {
   title: string;
@@ -20,6 +21,9 @@ export type DemoAlbum = {
   albumIntro: string;
   timestamp: number;
 };
+
+export type FavoriteAlbum = DemoAlbum | RecommendationAlbum;
+export type FavoritePodcast = DemoPodcast | RecommendationPodcast;
 
 export type AddTarget = 'album' | 'podcast';
 export type CoverSource = 'system' | 'local';
@@ -52,7 +56,7 @@ export const demoAlbum: DemoAlbum = {
     '《Kind of Blue》像一间被蓝光慢慢照亮的房间。它不急着展示复杂，而是把旋律、留白和即兴放在最自然的位置，让每一次进入都像重新听见空气的流动。这里先保留小程序中“完整介绍可滚动阅读”的卡片结构，真正的 API 生成内容会在后续功能阶段接入。',
 };
 
-export const demoAlbumFavorites: DemoAlbum[] = [
+export const demoAlbumFavorites: FavoriteAlbum[] = [
   demoAlbum,
   {
     albumTitle: 'Blue Train',
@@ -72,7 +76,7 @@ export const demoAlbumFavorites: DemoAlbum[] = [
   },
 ];
 
-export const demoPodcastFavorites: DemoPodcast[] = [
+export const demoPodcastFavorites: FavoritePodcast[] = [
   demoPodcast,
   {
     title: 'Radiolab',
@@ -121,7 +125,7 @@ export function saveLocalFavorites<T>(key: string, items: T[]) {
   }
 }
 
-export function saveAlbumFavorite(album: DemoAlbum) {
+export function saveAlbumFavorite(album: FavoriteAlbum) {
   const current = loadLocalFavorites(albumFavoritesStorageKey, demoAlbumFavorites);
   const next = [
     { ...album, timestamp: Date.now() },
@@ -130,7 +134,7 @@ export function saveAlbumFavorite(album: DemoAlbum) {
   saveLocalFavorites(albumFavoritesStorageKey, next);
 }
 
-export function savePodcastFavorite(podcast: DemoPodcast) {
+export function savePodcastFavorite(podcast: FavoritePodcast) {
   const current = loadLocalFavorites(podcastFavoritesStorageKey, demoPodcastFavorites);
   const next = [
     { ...podcast, timestamp: Date.now() },
