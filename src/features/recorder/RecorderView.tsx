@@ -3,7 +3,7 @@ import { Haptics } from '@capacitor/haptics';
 import { createNoteId } from '../../services/storage';
 import { transcribeSpeechAudio } from '../../services/speech';
 import type { AppSettings, BoneNote, NoteAudio } from '../../shared/types';
-import { DEFAULT_POLISH_MODEL } from '../../shared/apiMeta';
+import { DEFAULT_POLISH_MODEL } from '../../shared/apiConstants';
 import { audioExtension, blobToDataUrl, chooseAudioMimeType, extractChatText, formatRecorderTime, normalizeAudioToWav, recommendedAsrTimeout } from '../../shared/media/audio';
 
 export function RecorderView({

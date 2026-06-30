@@ -3,13 +3,11 @@ import { Check, ChevronLeft, Copy, Download, RefreshCw, Trash2, Upload } from 'l
 import { buildSettingsBackup, downloadBlob, readSettingsFromBackup, restoreFavoritesFromBackup } from '../../services/backup';
 import { getAppleAlbumPoolCount, getLiveAlbumReserveStatus } from '../../services/recommendations';
 import { checkSpeechConnectivity } from '../../services/speech';
+import { DEFAULT_ALBUM_INTRO_MODEL, SILICONFLOW_CHAT_COMPLETIONS_URL, VOLCANO_ALBUM_INTRO_URL } from '../../shared/apiConstants';
 import { writeTextToClipboard } from '../../shared/clipboard';
-import type { ApiCapability, ApiConfig, AppSettings, BoneNote, MusicPlatform, PodcastPlatform } from '../../shared/types';
+import { getMusicPlatformOption, getPodcastPlatformOption, musicPlatformOptions, podcastPlatformOptions } from '../../shared/platformLinks';
+import type { ApiCapability, ApiConfig, AppSettings, BoneNote } from '../../shared/types';
 import { ApiPanel } from './ApiPanel';
-
-const SILICONFLOW_CHAT_COMPLETIONS_URL = 'https://api.siliconflow.cn/v1/chat/completions';
-const VOLCANO_ALBUM_INTRO_URL = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions';
-const DEFAULT_ALBUM_INTRO_MODEL = 'bot-20250612194641-hvrdt';
 
 const speechModels = ['FunAudioLLM/SenseVoiceSmall'];
 const polishModels = [
@@ -20,18 +18,6 @@ const polishModels = [
   'zai-org/GLM-5.2',
 ];
 const disabledTextModels = ['Qwen/Qwen3.6-35B-A3B', 'moonshotai/Kimi-K2.6'];
-
-const podcastPlatforms: Array<{ value: PodcastPlatform; label: string; hint: string; tone: string }> = [
-  { value: 'xiaoyuzhou', label: '小宇宙', hint: '默认播客平台，点击前自动复制节目名。', tone: 'xiaoyuzhou' },
-  { value: 'apple-podcasts', label: 'Apple Podcasts', hint: '打开播客搜索页，适合苹果生态。', tone: 'apple-podcasts' },
-];
-
-const musicPlatforms: Array<{ value: MusicPlatform; label: string; hint: string; tone: string }> = [
-  { value: 'netease', label: '网易云音乐', hint: '默认音乐平台，点击前自动复制音乐人和专辑名。', tone: 'netease' },
-  { value: 'spotify', label: 'Spotify', hint: '直接触发 Spotify 搜索并填入名称。', tone: 'spotify' },
-  { value: 'apple-music', label: 'Apple Music', hint: '打开 Apple Music 搜索。', tone: 'apple-music' },
-  { value: 'qq-music', label: 'QQ 音乐', hint: '打开 QQ 音乐搜索。', tone: 'qq-music' },
-];
 
 const albumCollectionLabels: Record<string, string> = {
   'rolling-stone-500': 'Rolling Stone 500',
@@ -54,14 +40,6 @@ type ModelCheckResult = {
 
 function uniqueOptions(values: string[]) {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
-}
-
-function selectedPodcastPlatform(value: PodcastPlatform) {
-  return podcastPlatforms.find((option) => option.value === value) ?? podcastPlatforms[0];
-}
-
-function selectedMusicPlatform(value: MusicPlatform) {
-  return musicPlatforms.find((option) => option.value === value) ?? musicPlatforms[0];
 }
 
 async function assertOk(response: Response, label: string) {
@@ -150,8 +128,8 @@ export function SettingsView({
   const [appleReserveStatus, setAppleReserveStatus] = useState<'idle' | 'running' | 'ready'>('idle');
   const [checkingModels, setCheckingModels] = useState(false);
   const [modelCheckResults, setModelCheckResults] = useState<ModelCheckResult[]>([]);
-  const currentPodcastPlatform = selectedPodcastPlatform(settings.podcastPlatform);
-  const currentMusicPlatform = selectedMusicPlatform(settings.musicPlatform);
+  const currentPodcastPlatform = getPodcastPlatformOption(settings.podcastPlatform);
+  const currentMusicPlatform = getMusicPlatformOption(settings.musicPlatform);
 
   useEffect(() => {
     let cancelled = false;
@@ -558,7 +536,7 @@ export function SettingsView({
               <strong>{currentPodcastPlatform.label}</strong>
             </div>
             <div className="platform-choice-grid podcast-platforms">
-              {podcastPlatforms.map((platform) => (
+              {podcastPlatformOptions.map((platform) => (
                 <button
                   className={`platform-choice ${settings.podcastPlatform === platform.value ? 'active' : ''} ${platform.tone}`}
                   key={platform.value}
@@ -580,7 +558,7 @@ export function SettingsView({
               <strong>{currentMusicPlatform.label}</strong>
             </div>
             <div className="platform-choice-grid music-platforms">
-              {musicPlatforms.map((platform) => (
+              {musicPlatformOptions.map((platform) => (
                 <button
                   className={`platform-choice ${settings.musicPlatform === platform.value ? 'active' : ''} ${platform.tone}`}
                   key={platform.value}

@@ -2,8 +2,7 @@ import { Mic, Music2, Sparkles, Star } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ApiCapability, ApiInterfaceType, AppView } from './types';
 
-export const SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL = 'https://api.siliconflow.cn/v1/audio/transcriptions';
-export const DEFAULT_POLISH_MODEL = 'deepseek-ai/DeepSeek-V4-Pro';
+export { DEFAULT_POLISH_MODEL, SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL } from './apiConstants';
 
 export const capabilityLabels: Record<ApiCapability, { title: string; hint: string; icon: LucideIcon }> = {
   speechToText: {

@@ -1,4 +1,6 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { nativeHttpGet, shouldUseNativeHttp } from './nativeHttp';
+import { SILICONFLOW_CHAT_COMPLETIONS_URL } from '../shared/apiConstants';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 
 export type RecommendationKind = 'album' | 'podcast';
@@ -105,7 +107,6 @@ const APPLE_POOL_APPLE_BATCH_SIZE = 1;
 const APPLE_POOL_METADATA_QUEUE_LIMIT = 4;
 const APPLE_POOL_PAUSE_UNTIL_KEY = 'bone.apple-album-pool.pause-until.v1';
 const ITUNES_SEARCH_URL = 'https://itunes.apple.com/search';
-const SILICONFLOW_CHAT_COMPLETIONS_URL = 'https://api.siliconflow.cn/v1/chat/completions';
 const catalogCache = new Map<RecommendationKind, Promise<AlbumCandidate[] | PodcastCandidate[]>>();
 let liveAlbumCandidatesCache: Promise<LiveAlbumCandidate[]> | null = null;
 let prefetchedLiveAlbum: RecommendationAlbum | null = null;
@@ -121,10 +122,6 @@ const ApplePoolNative = registerPlugin<{
   getState(): Promise<{ pool?: string; used?: string; ready?: string; running?: string }>;
   setState(options: { pool: string; used: string; ready: string }): Promise<{ ok: boolean }>;
 }>('ApplePool');
-const NativeHttp = registerPlugin<{
-  get(options: { url: string; timeoutMs?: number }): Promise<{ status: number; body: string; url?: string }>;
-}>('NativeHttp');
-
 type StoredApplePoolAlbum = RecommendationAlbum & {
   applePoolItemId: string;
   applePoolCandidateId: string;
@@ -421,16 +418,6 @@ export async function discardApplePoolAlbum(album: Pick<RecommendationAlbum, 'ap
 
 export function keepApplePoolAlbum(album: Pick<RecommendationAlbum, 'applePoolCandidateId'>) {
   markApplePoolUsed(album.applePoolCandidateId);
-}
-
-function shouldUseNativeHttp(url: string) {
-  return Capacitor.isNativePlatform() && /^https?:\/\//i.test(url);
-}
-
-async function nativeHttpGet(url: string, timeoutMs: number): Promise<string> {
-  const response = await NativeHttp.get({ url, timeoutMs });
-  if (response.status < 200 || response.status >= 300) throw new Error(`请求失败（${response.status}）`);
-  return response.body;
 }
 
 async function fetchJson<T>(url: string, timeoutMs: number, signal?: AbortSignal): Promise<T> {

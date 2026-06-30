@@ -1,18 +1,7 @@
-import { Capacitor, registerPlugin } from '@capacitor/core';
-import { SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL } from '../shared/apiMeta';
+import { Capacitor } from '@capacitor/core';
+import { NativeHttp } from './nativeHttp';
+import { SILICONFLOW_AUDIO_TRANSCRIPTIONS_URL } from '../shared/apiConstants';
 import { blobToDataUrl, createSilentWav, extractTranscriptionText } from '../shared/media/audio';
-
-type NativeHttpPlugin = {
-  postMultipartAudio(options: {
-    url: string;
-    apiKey: string;
-    model: string;
-    dataUrl: string;
-    fileName: string;
-    mimeType: string;
-    timeoutMs: number;
-  }): Promise<{ status: number; body: string; text?: string; url?: string }>;
-};
 
 type SpeechUploadOptions = {
   apiKey: string;
@@ -23,8 +12,6 @@ type SpeechUploadOptions = {
   timeoutMs: number;
   url?: string;
 };
-
-const NativeHttp = registerPlugin<NativeHttpPlugin>('NativeHttp');
 
 function normalizeBearerToken(apiKey: string) {
   return apiKey.trim().replace(/^['"]|['"]$/g, '').replace(/^Bearer\s+/i, '').trim();
