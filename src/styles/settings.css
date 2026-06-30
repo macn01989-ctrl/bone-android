@@ -233,3 +233,368 @@
 .hidden-input {
   display: none;
 }
+
+.settings-screen-redesign .top-bar {
+  flex: none;
+}
+
+.settings-redesign-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: calc(34px + var(--safe-bottom));
+}
+
+.settings-hero-card,
+.settings-status-section,
+.settings-platform-card,
+.diary-privacy-card,
+.backup-redesign-card {
+  border: 2px solid #000000;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 6px 6px 0 #000000;
+}
+
+.settings-hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.96)),
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04) 2px, transparent 2px, transparent 10px);
+}
+
+.settings-hero-head,
+.settings-volcano-head,
+.settings-section-head,
+.settings-status-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.settings-hero-card h2,
+.settings-status-section h2,
+.settings-platform-card h2,
+.diary-privacy-card h2,
+.backup-redesign-card h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.settings-hero-card p,
+.settings-section-head p,
+.diary-privacy-card p {
+  margin: 6px 0 0;
+  color: rgba(0, 0, 0, 0.64);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.settings-hero-card a {
+  color: #d1232a;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.settings-modern-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.settings-modern-field span {
+  color: #111111;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.settings-modern-field input,
+.settings-modern-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.16);
+  font-size: 14px;
+  font-weight: 750;
+  outline: none;
+}
+
+.api-key-field input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.api-key-control-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.api-key-action,
+.settings-hero-actions button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  color: #000000;
+  background: #ffd600;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 #000000;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.api-key-action.danger {
+  color: #ffffff;
+  background: #d1232a;
+}
+
+.settings-model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+
+.settings-hero-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-hero-actions button:disabled {
+  opacity: 0.58;
+}
+
+.model-connectivity-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.model-connectivity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.model-connectivity-row.ok span {
+  color: #127a33;
+}
+
+.model-connectivity-row.fail span {
+  color: #d1232a;
+}
+
+.settings-platform-card,
+.settings-status-section,
+.backup-redesign-card {
+  padding: 16px;
+}
+
+.platform-picker-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.platform-picker-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.platform-picker-title strong {
+  color: #ffffff;
+  background: #000000;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.platform-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+  gap: 10px;
+}
+
+.platform-choice {
+  display: flex;
+  min-height: 76px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 12px;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.18);
+  text-align: left;
+}
+
+.platform-choice.active {
+  background: #ffd600;
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.platform-choice span {
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.platform-choice small {
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.album-collection-list {
+  margin-top: 14px;
+  overflow: hidden;
+  background: #fffef8;
+  border: 2px solid #000000;
+  border-radius: 14px;
+}
+
+.album-collection-title,
+.album-collection-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 13px;
+}
+
+.album-collection-title {
+  color: #ffffff;
+  background: #000000;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.album-collection-row {
+  color: #111111;
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.album-collection-row:first-child {
+  border-top: 0;
+}
+
+.album-collection-row strong {
+  min-width: 42px;
+  padding: 3px 9px;
+  color: #000000;
+  background: #ffd600;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.apple-status-dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: #a8a8a8;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.apple-status-dot.running {
+  background: #ffad33;
+}
+
+.apple-status-dot.ready {
+  background: #32d46b;
+}
+
+.diary-privacy-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.diary-privacy-card .switch {
+  flex: none;
+}
+
+.backup-grid .action-tile {
+  min-height: 82px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+}
+
+.backup-grid .action-tile svg {
+  order: 1;
+}
+
+.backup-grid .action-tile span {
+  order: 2;
+}
+
+.backup-grid .action-tile small {
+  order: 3;
+  color: rgba(0, 0, 0, 0.58);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.backup-mode-help {
+  margin: 12px 0 0;
+  color: rgba(0, 0, 0, 0.58);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+@media (max-width: 560px) {
+  .api-key-control-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-hero-actions {
+    justify-content: stretch;
+  }
+
+  .settings-hero-actions button {
+    width: 100%;
+  }
+
+  .diary-privacy-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

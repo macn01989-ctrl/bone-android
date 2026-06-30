@@ -28,6 +28,9 @@ export type ApiConfig = {
   timeoutMs: number;
   provider?: SpeechProvider;
   resourceId?: string;
+  connected?: boolean;
+  lastError?: string;
+  lastCheckedAt?: number;
 };
 
 export type ApiSettings = Record<ApiCapability, ApiConfig>;
