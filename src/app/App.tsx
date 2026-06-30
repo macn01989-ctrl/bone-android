@@ -191,6 +191,31 @@ function App() {
     await persistNotes(notes.filter((note) => note.id !== noteId), '笔记已删除');
   };
 
+  const deleteTags = async (tagsToDelete: string[]) => {
+    const targetTags = new Set(tagsToDelete);
+    if (targetTags.size === 0) return;
+
+    let changed = false;
+    const next = notes.map((note) => {
+      const tags = note.tags.filter((tag) => !targetTags.has(tag));
+      if (tags.length === note.tags.length) return note;
+      changed = true;
+      return { ...note, tags, updatedAt: Date.now() };
+    });
+
+    if (!changed) {
+      showToast('\u6ca1\u6709\u627e\u5230\u8981\u5220\u9664\u7684\u6807\u7b7e');
+      return;
+    }
+
+    await persistNotes(
+      next,
+      tagsToDelete.length > 1
+        ? '\u6807\u7b7e\u5df2\u5220\u9664'
+        : `\u6807\u7b7e\u201c${tagsToDelete[0]}\u201d\u5df2\u5220\u9664`,
+    );
+  };
+
   const togglePin = async (noteId: string) => {
     const colors: NonNullable<BoneNote['pinnedColor']>[] = ['blue', 'red', 'yellow'];
     const target = notes.find((note) => note.id === noteId);
@@ -301,7 +326,9 @@ function App() {
           onNew={() => openEditor(null, 'notes')}
           onEdit={(noteId) => openEditor(noteId, 'notes')}
           onDelete={deleteNote}
+          onDeleteTags={deleteTags}
           onTogglePin={togglePin}
+          diaryPrivacyEnabled={settings.diaryPrivacyEnabled}
           onRegisterBackHandler={registerBackHandler}
           onToast={showToast}
         />

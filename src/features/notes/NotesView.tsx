@@ -16,7 +16,9 @@ export function NotesView({
   onNew,
   onEdit,
   onDelete,
+  onDeleteTags,
   onTogglePin,
+  diaryPrivacyEnabled,
   onRegisterBackHandler,
   onToast,
 }: {
@@ -26,7 +28,9 @@ export function NotesView({
   onNew: () => void;
   onEdit: (noteId: string) => void;
   onDelete: (noteId: string) => Promise<void>;
+  onDeleteTags: (tags: string[]) => Promise<void>;
   onTogglePin: (noteId: string) => Promise<void>;
+  diaryPrivacyEnabled: boolean;
   onRegisterBackHandler: (handler: (() => boolean) | null) => void;
   onToast: (message: string) => void;
 }) {
@@ -58,7 +62,10 @@ export function NotesView({
 
   const filteredNotes = useMemo(() => {
     const text = confirmedSearchText.trim().toLowerCase();
+    const diaryTagSelected = selectedOptions.tag && selectedTags.includes('\u65e5\u8bb0');
     return sortNotes(notes).filter((note) => {
+      if (diaryPrivacyEnabled && note.tags.includes('\u65e5\u8bb0') && !diaryTagSelected) return false;
+
       if (text) {
         const haystack = `${note.title} ${plainTextFromRich(note.content)} ${note.tags.join(' ')}`.toLowerCase();
         if (!haystack.includes(text)) return false;
@@ -72,7 +79,7 @@ export function NotesView({
 
       return true;
     });
-  }, [notes, confirmedSearchText, selectedOptions, selectedTags]);
+  }, [notes, confirmedSearchText, selectedOptions, selectedTags, diaryPrivacyEnabled]);
 
   const hasFilters = selectedOptions.tag || selectedOptions.image || selectedOptions.voice || selectedTags.length > 0;
 
@@ -141,6 +148,27 @@ export function NotesView({
     setSelectedOptions((current) => ({
       ...current,
       tag: false,
+    }));
+    setShowTagFilter(false);
+  };
+
+  const deleteSelectedTags = async () => {
+    const tagsToDelete = Array.from(new Set(draftSelectedTags));
+
+    if (tagsToDelete.length === 0) {
+      onToast('\u5148\u9009\u4e2d\u8981\u5220\u9664\u7684\u6807\u7b7e');
+      return;
+    }
+
+    const targetTags = new Set(tagsToDelete);
+    const remainingSelectedTags = selectedTags.filter((tag) => !targetTags.has(tag));
+
+    await onDeleteTags(tagsToDelete);
+    setDraftSelectedTags((current) => current.filter((tag) => !targetTags.has(tag)));
+    setSelectedTags(remainingSelectedTags);
+    setSelectedOptions((current) => ({
+      ...current,
+      tag: remainingSelectedTags.length > 0,
     }));
     setShowTagFilter(false);
   };
@@ -566,6 +594,9 @@ export function NotesView({
             </div>
 
             <div className="page4-dialog-actions">
+              <button className="danger" type="button" onClick={() => void deleteSelectedTags()}>
+                {'\u5220\u9664\u6807\u7b7e'}
+              </button>
               <button className="ghost" type="button" onClick={clearTagFilter}>
                 清空
               </button>
