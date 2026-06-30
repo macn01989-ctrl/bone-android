@@ -4,18 +4,15 @@ Bone 是一个私人 Android 应用，用来记录声音、整理笔记、收藏
 
 它不是一个传统的效率工具，更像一个随身的个人记忆盒：把语音变成文字，把文字整理成日记，把喜欢的唱片和节目收进自己的收藏墙，在需要一点灵感的时候翻出一张专辑或一档播客。
 
-## Screenshots
+## 操作与功能
 
-截图可以放在 `screenshots/` 目录。建议后续补这几张图：
-
-| 页面 | 建议文件名 |
-| --- | --- |
-| 首页 | `screenshots/home.png` |
-| 录音页 | `screenshots/recorder.png` |
-| 笔记页 | `screenshots/notes.png` |
-| 专辑推荐 | `screenshots/albums.png` |
-| 播客推荐 | `screenshots/podcasts.png` |
-| 设置页 | `screenshots/settings.png` |
+<img width="3500" height="2475" alt="26" src="https://github.com/user-attachments/assets/4d0bb7e2-7c59-48a9-bb14-8e46e97a95ad" />
+<img width="3500" height="2475" alt="27" src="https://github.com/user-attachments/assets/9857d44c-00d4-4727-bb27-3c5c613ac1b5" />
+<img width="3500" height="2475" alt="28" src="https://github.com/user-attachments/assets/58bb069b-0b4b-4d98-bd63-a56d00328f2a" />
+<img width="3500" height="2475" alt="29" src="https://github.com/user-attachments/assets/cf43f3aa-eefa-44f7-80e0-d75861ac5514" />
+<img width="3500" height="2475" alt="30" src="https://github.com/user-attachments/assets/59b66178-a0cc-4b24-a766-c758e985b1e3" />
+<img width="3500" height="2475" alt="31" src="https://github.com/user-attachments/assets/f03f1db5-7157-466a-9cb0-be27c3b45a68" />
+<img width="3500" height="2475" alt="32" src="https://github.com/user-attachments/assets/2d5c353c-7ca2-4c05-8903-2dbe4be80658" />
 
 ## Features
 
