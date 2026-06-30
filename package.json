@@ -9,10 +9,8 @@
     "preview": "vite preview",
     "sync:android": "npm run build && npx cap sync android && npm run restore:good-apk-assets",
     "restore:good-apk-assets": "powershell -ExecutionPolicy Bypass -File tools/restore-good-apk-assets.ps1",
-    "sync:runtime-from-source": "powershell -ExecutionPolicy Bypass -File tools/sync-source-runtime.ps1",
     "sync:android:source": "npm run build && npx cap sync android",
-    "build:android:safe": "npm run restore:good-apk-assets -- -SkipDist && cd android && gradlew.bat assembleDebug",
-    "build:android:runtime-source": "npm run sync:runtime-from-source && cd android && gradlew.bat assembleDebug"
+    "build:android:safe": "npm run restore:good-apk-assets -- -SkipDist && cd android && gradlew.bat assembleDebug"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

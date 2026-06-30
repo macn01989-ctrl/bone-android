@@ -316,13 +316,7 @@ function App() {
         />
       )}
       {view === 'podcast' && <PodcastRecommendationView onOpenFavorites={() => openFavorites('podcast', true)} onToast={showToast} />}
-      {view === 'album' && (
-        <AlbumRecommendationView
-          settings={settings}
-          onOpenFavorites={() => openFavorites('album', true)}
-          onToast={showToast}
-        />
-      )}
+      {view === 'album' && <AlbumRecommendationView onOpenFavorites={() => openFavorites('album', true)} onToast={showToast} />}
       {view === 'favorites' && (
         <FavoritesWallView initialFace={favoritesFace} animateEntry={favoritesAnimateEntry} onToast={showToast} />
       )}

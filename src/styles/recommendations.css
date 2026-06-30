@@ -309,7 +309,6 @@
   color: rgba(255, 255, 255, 0.95);
   text-align: justify;
   word-break: break-word;
-  white-space: pre-line;
   box-sizing: border-box;
 }
 
