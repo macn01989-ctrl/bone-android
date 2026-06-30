@@ -6,18 +6,37 @@ export type PodcastEpisode = {
 };
 
 export type DemoPodcast = {
+  id?: string;
   title: string;
   author: string;
+  platforms?: string;
   artworkUrl: string;
   episodes: PodcastEpisode[];
   timestamp: number;
 };
 
 export type DemoAlbum = {
+  id?: string;
   albumTitle: string;
   albumArtist: string;
   artworkUrl: string;
+  originalArtworkUrl?: string;
   albumIntro: string;
+  collection?: 'rolling-stone-500' | 'chinese-rock' | 'apple-music' | '1001-albums';
+  styleTags?: string[];
+  releaseDate?: string;
+  releaseYear?: number | null;
+  label?: string;
+  trackCount?: number | null;
+  notableTracks?: string[];
+  detail?: {
+    introTitle?: string;
+    shortIntro?: string;
+    fullIntro?: string;
+    whyKeep?: string;
+    context?: string;
+    soundCharacteristics?: string[];
+  };
   timestamp: number;
 };
 

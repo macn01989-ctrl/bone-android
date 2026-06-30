@@ -413,6 +413,211 @@
   transform: scale(0.95);
 }
 
+.recommend-cover-stage {
+  position: relative;
+  width: min(250px, 70vw);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  margin-bottom: 34px;
+}
+
+.recommend-cover-stage .recommend-artwork {
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+}
+
+.recommend-cover-loader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+  pointer-events: none;
+}
+
+.recommend-cover-loader.cover-loader-leaving {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.recommend-card-meta {
+  width: min(86%, 320px);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.recommend-card-meta.content-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.recommend-card-meta .recommend-title {
+  max-width: 100%;
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.recommend-card-meta.compact-meta .recommend-title {
+  font-size: 24px;
+}
+
+.recommend-card-meta .recommend-artist {
+  max-width: 100%;
+  margin: 0 0 4px;
+  font-size: 18px;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.recommend-platform-button {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  color: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.recommend-platform-button.xiaoyuzhou,
+.recommend-platform-button.apple-podcasts {
+  background: #1e88e5;
+}
+
+.recommend-platform-button.netease,
+.recommend-platform-button.qq-music {
+  background: #d1232a;
+}
+
+.recommend-platform-button.spotify {
+  color: #111111;
+  background: #ffd700;
+}
+
+.recommend-platform-button.apple-music {
+  background: #000000;
+}
+
+.recommend-platform-button:active {
+  transform: scale(0.98);
+}
+
+.recommend-album-detail {
+  color: rgba(255, 255, 255, 0.96);
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.recommend-album-source {
+  display: inline-flex;
+  align-self: flex-start;
+  min-height: 28px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 10px;
+  color: #1f1f1f;
+  background: #ffd700;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.recommend-album-source.apple-music-source {
+  color: #ffffff;
+  background: #000000;
+}
+
+.recommend-album-styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.recommend-album-styles span {
+  min-height: 26px;
+  padding: 4px 8px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.recommend-album-lead,
+.recommend-album-paragraph,
+.recommend-album-note {
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 18px;
+  line-height: 1.55;
+  text-align: justify;
+  word-break: break-word;
+}
+
+.recommend-album-lead {
+  font-size: 19px;
+}
+
+.recommend-album-note {
+  padding-left: 10px;
+  border-left: 4px solid #ffd700;
+}
+
+.one-thousand-one-paragraph {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.recommend-platforms-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  color: rgba(255, 255, 255, 0.96);
+  text-align: center;
+}
+
+.recommend-platforms-text {
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.recommend-platforms-hint {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.recommend-episode-date-front {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .recommend-card.rotating-left {
   animation: recommend-rotate-slide-left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }

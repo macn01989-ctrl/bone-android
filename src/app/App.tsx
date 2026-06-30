@@ -342,10 +342,35 @@ function App() {
           onToast={showToast}
         />
       )}
-      {view === 'podcast' && <PodcastRecommendationView onOpenFavorites={() => openFavorites('podcast', true)} onToast={showToast} />}
-      {view === 'album' && <AlbumRecommendationView onOpenFavorites={() => openFavorites('album', true)} onToast={showToast} />}
+      {view === 'podcast' && (
+        <PodcastRecommendationView
+          onOpenFavorites={() => openFavorites('podcast', true)}
+          onToast={showToast}
+          platform={settings.podcastPlatform}
+        />
+      )}
+      {view === 'album' && (
+        <AlbumRecommendationView
+          liveConfig={{
+            apiKey: settings.api.albumIntro.apiKey,
+            model: settings.api.albumIntro.model || settings.albumIntroModel,
+            baseUrl: settings.api.albumIntro.baseUrl,
+            timeoutMs: settings.api.albumIntro.timeoutMs,
+            connected: settings.api.albumIntro.connected,
+            lastError: settings.api.albumIntro.lastError,
+          }}
+          onOpenFavorites={() => openFavorites('album', true)}
+          onToast={showToast}
+          platform={settings.musicPlatform}
+        />
+      )}
       {view === 'favorites' && (
-        <FavoritesWallView initialFace={favoritesFace} animateEntry={favoritesAnimateEntry} onToast={showToast} />
+        <FavoritesWallView
+          initialFace={favoritesFace}
+          animateEntry={favoritesAnimateEntry}
+          onRegisterBackHandler={registerBackHandler}
+          onToast={showToast}
+        />
       )}
       {view === 'settings' && (
         <SettingsView

@@ -290,6 +290,25 @@
   font-size: calc(26 * var(--rpx));
 }
 
+.favorites-album-popup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8 * var(--rpx));
+  margin-top: calc(12 * var(--rpx));
+}
+
+.favorites-album-popup-tags span {
+  min-height: calc(38 * var(--rpx));
+  padding: calc(6 * var(--rpx)) calc(14 * var(--rpx));
+  color: #333333;
+  background: rgba(255, 215, 0, 0.28);
+  border: var(--rpx) solid rgba(209, 35, 42, 0.25);
+  border-radius: calc(10 * var(--rpx));
+  font-size: calc(22 * var(--rpx));
+  font-weight: 800;
+  line-height: calc(26 * var(--rpx));
+}
+
 .favorites-popup-scroll-content {
   max-height: calc(100svh - (350 * var(--rpx)));
   overflow-y: auto;
@@ -620,6 +639,11 @@
 .favorites-add-popup-podcast .favorites-confirm-btn {
   color: #ffffff;
   background: #1e88e5;
+}
+
+.favorites-confirm-btn:disabled {
+  opacity: 0.6;
+  transform: none;
 }
 
 .favorites-delete-mask {

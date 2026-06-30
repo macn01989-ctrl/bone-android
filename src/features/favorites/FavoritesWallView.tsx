@@ -3,15 +3,18 @@ import type { ChangeEvent, TouchEvent } from 'react';
 import { Haptics } from '@capacitor/haptics';
 import type { AddTarget, CoverSource, DemoAlbum, DemoPodcast } from '../../data/demoLibrary';
 import { albumFallbackCover, albumFavoritesStorageKey, demoAlbumFavorites, demoPodcastFavorites, loadLocalFavorites, podcastFallbackCover, podcastFavoritesStorageKey, saveLocalFavorites } from '../../data/demoLibrary';
+import { findAlbumFavoriteFromApple, findPodcastFavoriteFromApple } from '../../services/recommendations';
 import { writeTextToClipboard } from '../../shared/clipboard';
 
 export function FavoritesWallView({
   initialFace,
   animateEntry,
+  onRegisterBackHandler,
   onToast,
 }: {
   initialFace: 'album' | 'podcast';
   animateEntry: boolean;
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
   onToast: (message: string) => void;
 }) {
   const [isFlipped, setIsFlipped] = useState(animateEntry ? false : initialFace === 'album');
@@ -34,6 +37,8 @@ export function FavoritesWallView({
   const [manualCoverUrl, setManualCoverUrl] = useState('');
   const [addConfirmStep, setAddConfirmStep] = useState(false);
   const [addErrorText, setAddErrorText] = useState('');
+  const [isSearchingCover, setIsSearchingCover] = useState(false);
+  const [resolvedPodcast, setResolvedPodcast] = useState<DemoPodcast | null>(null);
   const [pendingDelete, setPendingDelete] = useState<{ target: AddTarget; index: number; name: string } | null>(null);
   const wallTouchRef = useRef({ startX: 0, startY: 0 });
   const popupTouchRef = useRef({ startY: 0, dragging: false });
@@ -65,6 +70,8 @@ export function FavoritesWallView({
     setManualCoverUrl('');
     setAddConfirmStep(false);
     setAddErrorText('');
+    setIsSearchingCover(false);
+    setResolvedPodcast(null);
   };
 
   const openAddPopupByType = (target: AddTarget) => {
@@ -77,6 +84,30 @@ export function FavoritesWallView({
     setShowAddPopup(false);
     resetAddState();
   };
+
+  useEffect(() => {
+    if (!onRegisterBackHandler) return undefined;
+
+    onRegisterBackHandler(() => {
+      if (pendingDelete) {
+        setPendingDelete(null);
+        return true;
+      }
+      if (showAddPopup) {
+        closeAddPopup();
+        return true;
+      }
+      if (selectedAlbum || selectedPodcast) {
+        setSelectedAlbum(null);
+        setSelectedPodcast(null);
+        setPopupTranslateY(0);
+        return true;
+      }
+      return false;
+    });
+
+    return () => onRegisterBackHandler(null);
+  }, [onRegisterBackHandler, pendingDelete, selectedAlbum, selectedPodcast, showAddPopup]);
 
   const swipeDisplay = () => {
     setIsFlipped((current) => !current);
@@ -205,6 +236,7 @@ export function FavoritesWallView({
       setCoverSource('local');
       setAddConfirmStep(false);
       setAddErrorText('');
+      setResolvedPodcast(null);
     };
     reader.readAsDataURL(file);
     event.target.value = '';
@@ -219,7 +251,7 @@ export function FavoritesWallView({
     coverFileInputRef.current?.click();
   };
 
-  const handleConfirmAdd = () => {
+  const handleConfirmAdd = async () => {
     const cleanName = addName.trim();
     if (!cleanName) {
       setAddErrorText(addTarget === 'album' ? '请先输入专辑名' : '请先输入播客名');
@@ -227,9 +259,36 @@ export function FavoritesWallView({
     }
 
     if (coverSource === 'system' && !addConfirmStep) {
-      setManualCoverUrl(addTarget === 'album' ? albumFallbackCover : podcastFallbackCover);
-      setAddConfirmStep(true);
       setAddErrorText('');
+      setIsSearchingCover(true);
+
+      try {
+        if (addTarget === 'album') {
+          const foundAlbum = await findAlbumFavoriteFromApple(cleanName, addArtistName.trim());
+          if (foundAlbum) {
+            setAddName(foundAlbum.albumTitle);
+            setAddArtistName(foundAlbum.albumArtist);
+            setManualCoverUrl(foundAlbum.artworkUrl);
+            setAddConfirmStep(true);
+            return;
+          }
+        } else {
+          const foundPodcast = await findPodcastFavoriteFromApple(cleanName);
+          if (foundPodcast) {
+            setResolvedPodcast(foundPodcast);
+            setAddName(foundPodcast.title);
+            setManualCoverUrl(foundPodcast.artworkUrl);
+            setAddConfirmStep(true);
+            return;
+          }
+        }
+
+        setManualCoverUrl(addTarget === 'album' ? albumFallbackCover : podcastFallbackCover);
+        setAddConfirmStep(true);
+        setAddErrorText('没有找到匹配封面，已先使用默认封面。');
+      } finally {
+        setIsSearchingCover(false);
+      }
       return;
     }
 
@@ -238,11 +297,12 @@ export function FavoritesWallView({
       setAlbumFavorites((items) => {
         const next = [
           {
-          albumTitle: cleanName,
-          albumArtist: addArtistName.trim() || '未知艺术家',
-          artworkUrl: manualCoverUrl || albumFallbackCover,
-          albumIntro: `《${cleanName}》的介绍内容会在后续功能阶段由 API 生成。当前先保留微信小程序收藏墙的展示和弹窗形态。`,
-          timestamp: now,
+            albumTitle: cleanName,
+            albumArtist: addArtistName.trim() || '未知艺术家',
+            artworkUrl: manualCoverUrl || albumFallbackCover,
+            albumIntro: `《${cleanName}》已加入收藏墙。后续可继续接入 API 生成更完整的专辑介绍。`,
+            styleTags: coverSource === 'system' ? ['系统匹配'] : ['本地封面'],
+            timestamp: now,
           },
           ...items,
         ];
@@ -251,17 +311,26 @@ export function FavoritesWallView({
       });
     } else {
       setPodcastFavorites((items) => {
+        const podcastToSave: DemoPodcast = resolvedPodcast
+          ? {
+              ...resolvedPodcast,
+              title: cleanName || resolvedPodcast.title,
+              artworkUrl: manualCoverUrl || resolvedPodcast.artworkUrl,
+              timestamp: now,
+            }
+          : {
+              title: cleanName,
+              author: '用户添加',
+              platforms: coverSource === 'system' ? 'Apple Podcasts / 小宇宙' : '本地添加',
+              artworkUrl: manualCoverUrl || podcastFallbackCover,
+              timestamp: now,
+              episodes: [
+                { title: '最新节目会在后续功能阶段接入', date: 'UI preview' },
+                { title: '当前先保留弹窗和列表形态', date: 'UI preview' },
+              ],
+            };
         const next = [
-          {
-          title: cleanName,
-          author: '用户添加',
-          artworkUrl: manualCoverUrl || podcastFallbackCover,
-          timestamp: now,
-          episodes: [
-            { title: '最新节目会在后续功能阶段接入', date: 'UI preview' },
-            { title: '当前先保留弹窗和列表形态', date: 'UI preview' },
-          ],
-          },
+          podcastToSave,
           ...items,
         ];
         saveLocalFavorites(podcastFavoritesStorageKey, next);
@@ -304,6 +373,14 @@ export function FavoritesWallView({
       </button>
     );
   };
+
+  const selectedAlbumDescription = selectedAlbum
+    ? [
+        selectedAlbum.detail?.shortIntro,
+        selectedAlbum.detail?.fullIntro,
+        selectedAlbum.detail?.whyKeep,
+      ].filter(Boolean).join('\n\n') || selectedAlbum.albumIntro || '暂无介绍'
+    : '';
 
   return (
     <section className="favorites-page" onTouchEnd={onWallTouchEnd} onTouchStart={onWallTouchStart}>
@@ -362,10 +439,17 @@ export function FavoritesWallView({
               <header className="favorites-popup-header">
                 <div className="favorites-album-popup-title">{selectedAlbum.albumTitle}</div>
                 <div className="favorites-album-popup-artist">by {selectedAlbum.albumArtist}</div>
+                {selectedAlbum.styleTags && selectedAlbum.styleTags.length > 0 && (
+                  <div className="favorites-album-popup-tags">
+                    {selectedAlbum.styleTags.slice(0, 4).map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                )}
               </header>
               <div className="favorites-popup-scroll-content">
                 <div className="favorites-popup-text-wrapper">
-                  <p className="favorites-popup-text">{selectedAlbum.albumIntro || '暂无介绍'}</p>
+                  <p className="favorites-popup-text">{selectedAlbumDescription}</p>
                 </div>
               </div>
             </div>
@@ -447,6 +531,7 @@ export function FavoritesWallView({
                     setManualCoverUrl('');
                     setAddConfirmStep(false);
                     setAddErrorText('');
+                    setResolvedPodcast(null);
                   }}
                   aria-label="切换封面来源"
                 >
@@ -461,6 +546,7 @@ export function FavoritesWallView({
                   setAddName(event.target.value);
                   setAddConfirmStep(false);
                   setAddErrorText('');
+                  setResolvedPodcast(null);
                   if (coverSource === 'system') setManualCoverUrl('');
                 }}
                 placeholder={addTarget === 'album' ? '请输入专辑名（必填）' : '请输入播客名（必填）'}
@@ -474,6 +560,7 @@ export function FavoritesWallView({
                     setAddArtistName(event.target.value);
                     setAddConfirmStep(false);
                     setAddErrorText('');
+                    setResolvedPodcast(null);
                     if (coverSource === 'system') setManualCoverUrl('');
                   }}
                   placeholder="请输入作者名（选填）"
@@ -487,8 +574,13 @@ export function FavoritesWallView({
               <button className="favorites-add-action-btn favorites-cancel-btn" type="button" onClick={closeAddPopup}>
                 取消
               </button>
-              <button className="favorites-add-action-btn favorites-confirm-btn" type="button" onClick={handleConfirmAdd}>
-                {addConfirmStep ? '确认' : addTarget === 'album' ? '添加专辑' : '添加播客'}
+              <button
+                className="favorites-add-action-btn favorites-confirm-btn"
+                type="button"
+                disabled={isSearchingCover}
+                onClick={() => void handleConfirmAdd()}
+              >
+                {isSearchingCover ? '搜索中…' : addConfirmStep ? '确认' : addTarget === 'album' ? '添加专辑' : '添加播客'}
               </button>
             </div>
           </section>

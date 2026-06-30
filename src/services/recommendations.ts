@@ -141,6 +141,10 @@ type QueuedAppleMetadata = {
 export type LiveAlbumConfig = {
   apiKey: string;
   model: string;
+  baseUrl?: string;
+  timeoutMs?: number;
+  connected?: boolean;
+  lastError?: string;
 };
 
 function historyKey(kind: RecommendationKind) {
@@ -757,7 +761,7 @@ async function buildLiveAlbumFromApple(candidate: LiveAlbumCandidate, apple: ITu
     primaryGenre: apple.primaryGenreName ?? '',
     trackCount: apple.trackCount ?? null,
   };
-  const response = await fetch(SILICONFLOW_CHAT_COMPLETIONS_URL, {
+  const response = await fetch(config.baseUrl || SILICONFLOW_CHAT_COMPLETIONS_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1021,7 +1025,7 @@ async function requestSingleLiveAlbum(config: LiveAlbumConfig): Promise<Recommen
   const maxAttempts = Math.min(5, shuffled.length);
   for (const candidate of shuffled.slice(0, maxAttempts)) {
     usedLiveAlbumIds.add(candidate.id);
-    const result = await getLiveAlbum(candidate, config, AbortSignal.timeout(45_000)).catch(() => null);
+    const result = await getLiveAlbum(candidate, config, AbortSignal.timeout(config.timeoutMs || 45_000)).catch(() => null);
     if (result) return result;
   }
 
